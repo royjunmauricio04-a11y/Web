@@ -1,9 +1,7 @@
 const path = require('path');
-const fs = require('fs');
 const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
-const multer = require('multer');
 require('dotenv').config();
 
 const app = express();
@@ -20,51 +18,6 @@ app.use(cors());
 // ---------------------------------------------------------------------
 const SITE_ROOT = path.join(__dirname, '..');
 app.use(express.static(SITE_ROOT));
-
-// ---------------------------------------------------------------------
-// File uploads (TOR / Enrollment Form / TCR)
-// Saved to disk under uploads/, served back out at /uploads/<filename>.
-// This is what js/documents.js on profile.html actually calls — it used
-// to point at an endpoint that didn't exist.
-// ---------------------------------------------------------------------
-const UPLOAD_DIR = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-app.use('/uploads', express.static(UPLOAD_DIR));
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, UPLOAD_DIR),
-    filename: (req, file, cb) => {
-        const safeDocType = (req.body.docType || 'file').replace(/[^a-z0-9]/gi, '');
-        const safeUid = (req.body.uid || 'unknown').replace(/[^a-zA-Z0-9]/g, '');
-        const ext = path.extname(file.originalname) || '';
-        cb(null, `${safeUid}_${safeDocType}_${Date.now()}${ext}`);
-    }
-});
-
-const upload = multer({
-    storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB, matches documents.js's own check
-    fileFilter: (req, file, cb) => {
-        const ok = file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf';
-        cb(ok ? null : new Error('Only PDF or image files are allowed'), ok);
-    }
-});
-
-app.post('/api/upload-document', (req, res) => {
-    upload.single('file')(req, res, (err) => {
-        if (err) {
-            return res.status(400).json({ success: false, message: err.message || 'Upload failed' });
-        }
-        if (!req.file) {
-            return res.status(400).json({ success: false, message: 'No file received' });
-        }
-        res.status(200).json({
-            success: true,
-            fileName: req.file.originalname,
-            url: `/uploads/${req.file.filename}`
-        });
-    });
-});
 
 // ---------------------------------------------------------------------
 // Email — application link
