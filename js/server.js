@@ -4,16 +4,13 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-app.use(express.json());
-app.use(cors());
 
-// Nodemailer Transporter Setup
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
+app.use(cors());
+app.use(express.json());
+
+// Root route para sa Health Check
+app.get('/', (req, res) => {
+    res.status(200).send('WebEnroll Email Server is running.');
 });
 
 // API Endpoint para sa Email Request
@@ -23,6 +20,15 @@ app.post('/api/send-email', async (req, res) => {
     if (!email || !college) {
         return res.status(400).json({ success: false, message: 'Missing parameters' });
     }
+
+    // Nodemailer Transporter
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '') : ''
+        }
+    });
 
     const applySection = applyUrl
         ? `<p style="margin: 20px 0;"><a href="${applyUrl}" style="background:#1f56c5;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:600;display:inline-block;">Go to Application Portal ↗</a></p>`
@@ -59,6 +65,6 @@ app.post('/api/send-email', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
 });

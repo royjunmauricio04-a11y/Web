@@ -1,10 +1,10 @@
 {
-  "name": "versions2",
+  "name": "webenroll-server",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Backend email server for WebEnroll",
+  "main": "js/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node js/server.js"
   },
   "repository": {
     "type": "git",
@@ -19,9 +19,9 @@
   },
   "homepage": "https://github.com/Dreamy2452/Webennroll#readme",
   "dependencies": {
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "nodemailer": "^9.1.1"
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "nodemailer": "^6.9.13"
   }
 }
