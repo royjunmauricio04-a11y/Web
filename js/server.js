@@ -1,8 +1,16 @@
 const path = require('path');
+const dns = require('dns');
 const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
 require('dotenv').config();
+
+// Render's outbound network can hand back an IPv6 route to Gmail's SMTP
+// relay that Render then can't actually reach (ENETUNREACH). Setting
+// `family: 4` on the transporter alone doesn't always stop nodemailer from
+// trying IPv6 — forcing it here, at the DNS-lookup level, is the stronger
+// guarantee that actually works on Render.
+try { dns.setDefaultResultOrder('ipv4first'); } catch (e) { /* Node < 18, ignore */ }
 
 const app = express();
 app.use(express.json());
@@ -24,9 +32,12 @@ app.use(express.static(SITE_ROOT));
 // ---------------------------------------------------------------------
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
+    port: 465,
+    secure: true, // port 465 requires secure:true (465 = implicit TLS, 587 = STARTTLS)
     family: 4,
+    // Belt-and-suspenders: force the actual socket's DNS lookup to IPv4,
+    // instead of relying on `family` being forwarded correctly.
+    lookup: (hostname, options, callback) => dns.lookup(hostname, { family: 4 }, callback),
     connectionTimeout: 30000,
     greetingTimeout: 30000,
     socketTimeout: 30000,
