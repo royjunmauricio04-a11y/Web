@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | WebEnnroll</title>
+
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+
+<body class="onboarding-page">
+
+<header class="site-header">
+
+    <div class="header-inner">
+
+        <a href="index.html" class="brand">
+            WebEnnroll
+        </a>
+
+        <a href="index.html" class="auth-exit">
+            Exit
+        </a>
+
+    </div>
+
+</header>
+
+
+<main class="onboarding-main">
+
+    <div class="onboarding-container">
+
+
+        <!-- PROGRESS -->
+
+        <div class="onboarding-progress">
+
+            <div class="progress-info">
+
+                <span id="stepLabel">
+                    Step 1 of 7
+                </span>
+
+                <span id="progressPercent">
+                    14%
+                </span>
+
+            </div>
+
+            <div class="progress-track">
+
+                <div
+                    class="progress-fill"
+                    id="progressFill"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <form id="signupForm">
+
+
+            <!-- =================================
+                 STEP 1
+            ================================== -->
+
+            <section
+                class="signup-step active"
+                data-step="1"
+            >
+
+                <span class="step-eyebrow">
+                    ABOUT YOU
+                </span>
+
+                <h1>
+                    Let's get to know you.
+                </h1>
+
+                <p class="step-description">
+                    Tell us a little about yourself
+                    so we can personalize your WebEnnroll
+                    experience.
+                </p>
+
+
+                <div class="field">
+
+                    <label for="firstName">
+                        First name
+                    </label>
+
+                    <input
+                        id="firstName"
+                        type="text"
+                        autocomplete="given-name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="middleName">
+                        Middle name
+                        <span>Optional</span>
+                    </label>
+
+                    <input
+                        id="middleName"
+                        type="text"
+                        autocomplete="additional-name"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="lastName">
+                        Last name
+                    </label>
+
+                    <input
+                        id="lastName"
+                        type="text"
+                        autocomplete="family-name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="step-buttons">
+
+                    <button
+                        type="button"
+                        class="next-button"
+                        data-next
+                    >
+                        Next
+                        <span>→</span>
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================
+                 STEP 2
+            ================================== -->
+
+            <section
+                class="signup-step"
+                data-step="2"
+            >
+
+                <span class="step-eyebrow">
+                    STUDENT INFORMATION
+                </span>
+
+                <h1>
+                    Tell us about your education.
+                </h1>
+
+                <p class="step-description">
+                    This information helps us understand
+                    your current academic situation.
+                </p>
+
+
+                <div class="field">
+
+                    <label for="lrn">
+                        Learner Reference Number (LRN)
+                    </label>
+
+                    <input
+                        id="lrn"
+                        type="text"
+                        inputmode="numeric"
+                        maxlength="12"
+                        placeholder="12-digit LRN"
+                        required
+                    >
+
+                    <small>
+                        Your LRN will not be shown publicly.
+                    </small>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="birthDate">
+                        Date of birth
+                    </label>
+
+                    <input
+                        id="birthDate"
+                        type="date"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="gradeLevel">
+                        Current grade level
+                    </label>
+
+                    <select id="gradeLevel" required>
+
+                        <option value="">
+                            Select grade level
+                        </option>
+
+                        <option value="Grade 10">
+                            Grade 10
+                        </option>
+
+                        <option value="Grade 11">
+                            Grade 11
+                        </option>
+
+                        <option value="Grade 12">
+                            Grade 12
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="school">
+                        Current school
+                    </label>
+
+                    <input
+                        id="school"
+                        type="text"
+                        placeholder="School name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="step-buttons">
+
+                    <button
+                        type="button"
+                        class="back-button"
+                        data-back
+                    >
+                        ← Back
+                    </button>
+
+                    <button
+                        type="button"
+                        class="next-button"
+                        data-next
+                    >
+                        Next →
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================
+                 STEP 3
+            ================================== -->
+
+            <section
+                class="signup-step"
+                data-step="3"
+            >
+
+                <span class="step-eyebrow">
+                    INTERESTS
+                </span>
+
+                <h1>
+                    What are you interested in?
+                </h1>
+
+                <p class="step-description">
+                    Choose all the fields you may want
+                    to study in college.
+                </p>
+
+
+                <div class="choice-grid">
+
+                    <label class="choice">
+
+                        <input
+                            type="checkbox"
+                            name="interest"
+                            value="Information Technology"
+                        >
+
+                        <span>
+                            Information Technology
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="checkbox"
+                            name="interest"
+                            value="Computer Science"
+                        >
+
+                        <span>
+                            Computer Science
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="checkbox"
+                            name="interest"
+                            value="Engineering"
+                        >
+
+                        <span>
+                            Engineering
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="checkbox"
+                            name="interest"
+                            value="Business"
+                        >
+
+                        <span>
+                            Business
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="checkbox"
+                            name="interest"
+                            value="Education"
+                        >
+
+                        <span>
+                            Education
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="checkbox"
+                            name="interest"
+                            value="Health Sciences"
+                        >
+
+                        <span>
+                            Health Sciences
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="checkbox"
+                            name="interest"
+                            value="Arts and Design"
+                        >
+
+                        <span>
+                            Arts & Design
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="checkbox"
+                            name="interest"
+                            value="Other"
+                        >
+
+                        <span>
+                            Other / Not sure
+                        </span>
+
+                    </label>
+
+                </div>
+
+
+                <div class="step-buttons">
+
+                    <button
+                        type="button"
+                        class="back-button"
+                        data-back
+                    >
+                        ← Back
+                    </button>
+
+                    <button
+                        type="button"
+                        class="next-button"
+                        data-next
+                    >
+                        Next →
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================
+                 STEP 4
+            ================================== -->
+
+            <section
+                class="signup-step"
+                data-step="4"
+            >
+
+                <span class="step-eyebrow">
+                    LOCATION
+                </span>
+
+                <h1>
+                    Where would you like to study?
+                </h1>
+
+                <p class="step-description">
+                    We'll use your preference when
+                    ranking college recommendations.
+                </p>
+
+
+                <div class="choice-list">
+
+                    <label class="choice">
+
+                        <input
+                            type="radio"
+                            name="location"
+                            value="Metro Manila"
+                            required
+                        >
+
+                        <span>
+                            Metro Manila
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="radio"
+                            name="location"
+                            value="Quezon City"
+                        >
+
+                        <span>
+                            Quezon City
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="radio"
+                            name="location"
+                            value="Manila"
+                        >
+
+                        <span>
+                            Manila
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="radio"
+                            name="location"
+                            value="Nearby Provinces"
+                        >
+
+                        <span>
+                            Nearby provinces
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="radio"
+                            name="location"
+                            value="Anywhere"
+                        >
+
+                        <span>
+                            Anywhere in the Philippines
+                        </span>
+
+                    </label>
+
+                </div>
+
+
+                <div class="step-buttons">
+
+                    <button
+                        type="button"
+                        class="back-button"
+                        data-back
+                    >
+                        ← Back
+                    </button>
+
+                    <button
+                        type="button"
+                        class="next-button"
+                        data-next
+                    >
+                        Next →
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================
+                 STEP 5
+            ================================== -->
+
+            <section
+                class="signup-step"
+                data-step="5"
+            >
+
+                <span class="step-eyebrow">
+                    SCHOOL PREFERENCE
+                </span>
+
+                <h1>
+                    What type of school do you prefer?
+                </h1>
+
+                <p class="step-description">
+                    You can always change your preferences
+                    later.
+                </p>
+
+
+                <div class="choice-list">
+
+                    <label class="choice">
+
+                        <input
+                            type="radio"
+                            name="schoolType"
+                            value="Public"
+                            required
+                        >
+
+                        <span>
+                            Public university
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="radio"
+                            name="schoolType"
+                            value="Private"
+                        >
+
+                        <span>
+                            Private university
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="radio"
+                            name="schoolType"
+                            value="Either"
+                        >
+
+                        <span>
+                            No preference
+                        </span>
+
+                    </label>
+
+                </div>
+
+
+                <div class="step-buttons">
+
+                    <button
+                        type="button"
+                        class="back-button"
+                        data-back
+                    >
+                        ← Back
+                    </button>
+
+                    <button
+                        type="button"
+                        class="next-button"
+                        data-next
+                    >
+                        Next →
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================
+                 STEP 6
+            ================================== -->
+
+            <section
+                class="signup-step"
+                data-step="6"
+            >
+
+                <span class="step-eyebrow">
+                    YOUR PRIORITIES
+                </span>
+
+                <h1>
+                    What matters most to you?
+                </h1>
+
+                <p class="step-description">
+                    Select the things that are important
+                    when choosing a college.
+                </p>
+
+
+                <div class="choice-list">
+
+                    <label class="choice">
+
+                        <input
+                            type="checkbox"
+                            name="priority"
+                            value="Tuition"
+                        >
+
+                        <span>
+                            Affordable tuition
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="checkbox"
+                            name="priority"
+                            value="Scholarships"
+                        >
+
+                        <span>
+                            Scholarships and financial aid
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="checkbox"
+                            name="priority"
+                            value="Location"
+                        >
+
+                        <span>
+                            Convenient location
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="checkbox"
+                            name="priority"
+                            value="Programs"
+                        >
+
+                        <span>
+                            Available programs
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="checkbox"
+                            name="priority"
+                            value="Facilities"
+                        >
+
+                        <span>
+                            Facilities and campus
+                        </span>
+
+                    </label>
+
+
+                    <label class="choice">
+
+                        <input
+                            type="checkbox"
+                            name="priority"
+                            value="Reputation"
+                        >
+
+                        <span>
+                            School reputation
+                        </span>
+
+                    </label>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="financialAid">
+                        Do you need financial assistance?
+                    </label>
+
+                    <select id="financialAid" required>
+
+                        <option value="">
+                            Select one
+                        </option>
+
+                        <option value="Yes">
+                            Yes
+                        </option>
+
+                        <option value="No">
+                            No
+                        </option>
+
+                        <option value="Not sure">
+                            I'm not sure
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="step-buttons">
+
+                         <button
+                        type="button"
+                        class="back-button"
+                        data-back
+                    >
+                        ← Back
+                    </button>
+
+                    <button
+                        type="button"
+                        class="next-button"
+                        data-next
+                    >
+                        Next →
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================
+                 STEP 7
+            ================================== -->
+
+            <section
+                class="signup-step"
+                data-step="7"
+            >
+
+                <span class="step-eyebrow">
+                    CREATE YOUR ACCOUNT
+                </span>
+
+                <h1>
+                    Almost there.
+                </h1>
+
+                <p class="step-description">
+                    Create your WebEnnroll account to save
+                    your information and college preferences.
+                </p>
+
+
+                <div class="field">
+
+                    <label for="email">
+                        Email address
+                    </label>
+
+                    <input
+                        id="email"
+                        type="email"
+                        autocomplete="email"
+                        placeholder="you@example.com"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        id="password"
+                        type="password"
+                        autocomplete="new-password"
+                        placeholder="Create a password"
+                        minlength="8"
+                        required
+                    >
+
+                    <small>
+                        Use at least 8 characters.
+                    </small>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="confirmPassword">
+                        Confirm password
+                    </label>
+
+                    <input
+                        id="confirmPassword"
+                        type="password"
+                        autocomplete="new-password"
+                        placeholder="Enter your password again"
+                        minlength="8"
+                        required
+                    >
+
+                </div>
+
+
+                <label class="terms-check">
+
+                    <input
+                        type="checkbox"
+                        id="terms"
+                        required
+                    >
+
+                    <span>
+                        I agree to the WebEnnroll terms and
+                        understand how my information will be
+                        used for college recommendations.
+                    </span>
+
+                </label>
+
+
+                <div
+                    class="form-error"
+                    id="formError"
+                    role="alert"
+                    aria-live="polite"
+                ></div>
+
+
+                <div class="step-buttons">
+
+                    <button
+                        type="button"
+                        class="back-button"
+                        data-back
+                    >
+                        ← Back
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="create-button"
+                    >
+                        Create account
+                    </button>
+
+                </div>
+
+            </section>
+
+        </form>
+
+    </div>
+
+</main>
+
+
+<script type="module" src="js/authGuard.js"></script>
+<script type="module" src="js/signup.js"></script>
+<script src="js/cookie-consent.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+
+    <style>
+        .home-main {
+            background: #f8f9f3;
+        }
+
+        .hero {
+            width: min(1180px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 100px 0 90px;
+        }
+
+        .hero-content {
+            max-width: 760px;
+        }
+
+        .hero h1 {
+            margin: 0 0 20px;
+            color: #20252d;
+            font-size: clamp(42px, 7vw, 72px);
+            line-height: 1.03;
+            letter-spacing: -2px;
+        }
+
+        .hero p {
+            max-width: 650px;
+            margin: 0 0 30px;
+            color: #68717d;
+            font-size: 17px;
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .section {
+            border-top: 1px solid #e8ebef;
+        }
+
+        .section-inner {
+            width: min(1180px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 75px 0;
+        }
+
+        .section h2 {
+            margin: 0 0 12px;
+            font-size: 30px;
+            letter-spacing: -0.5px;
+        }
+
+        .section-intro {
+            max-width: 650px;
+            margin: 0 0 35px;
+            color: #707985;
+            line-height: 1.7;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .feature-card {
+            padding: 25px;
+            border: 1px solid #dfe4ea;
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .feature-card h3 {
+            margin: 0 0 9px;
+            font-size: 17px;
+        }
+
+        .feature-card p {
+            margin: 0;
+            color: #727b86;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .step {
+            padding: 25px 0;
+            border-top: 2px solid #1f56c5;
+        }
+
+        .step-number {
+            color: #1f56c5;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .step h3 {
+            margin: 10px 0 8px;
+            font-size: 17px;
+        }
+
+        .step p {
+            margin: 0;
+            color: #727b86;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .home-footer {
+            border-top: 1px solid #e5e8ec;
+            padding: 30px 20px;
+            color: #7b838d;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        @media (max-width: 800px) {
+            .feature-grid,
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 70px 0;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .hero,
+            .section-inner {
+                width: calc(100% - 32px);
+            }
+
+            .hero h1 {
+                font-size: 42px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+        <a href="index.html" class="brand">WebEnroll</a>
+
+        <nav class="desktop-nav" id="desktopNav">
+            <a href="index.html">Home</a>
+            <a href="colleges.html">Find Colleges</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#features">Features</a>
+        </nav>
+
+        <div class="header-actions" id="headerActions">
+            <a href="login.html" class="login-link">Sign In</a>
+            <a href="signup.html" class="primary-button small">Get Started</a>
+        </div>
+
+        <button class="menu-button" id="menuButton" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
+    </div>
+</header>
+
+<!-- MOBILE MENU -->
+<aside class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-menu-header">
+        <button class="close-button" id="closeButton" type="button" aria-label="Close menu">×</button>
+    </div>
+
+    <nav class="mobile-nav" id="mobileNav">
+        <a href="index.html">Home</a>
+        <a href="colleges.html">Find Colleges</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#features">Features</a>
+        <a href="login.html" id="mobileSignIn">Sign In</a>
+        <a href="signup.html" class="mobile-cta" id="mobileSignUp">Create Account</a>
+    </nav>
+</aside>
+
+<main class="home-main">
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Your next step starts here.</h1>
+            <p>Explore colleges, organize your application journey, and keep the important details in one place.</p>
+
+            <div class="hero-actions">
+                <a href="colleges.html" class="primary-button">Find a College</a>
+                <a href="signup.html" class="secondary-button" id="heroCta">Create an Account</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section" id="how-it-works">
+        <div class="section-inner">
+            <h2>How it works</h2>
+            <p class="section-intro">WebEnroll gives students a simple way to discover schools and organize the next steps in their college journey.</p>
+
+            <div class="steps">
+                <article class="step">
+                    <span class="step-number">01</span>
+                    <h3>Explore</h3>
+                    <p>Browse colleges and universities that match what you are looking for.</p>
+                </article>
+
+                <article class="step">
+                    <span class="step-number">02</span>
+                    <h3>Organize</h3>
+                    <p>Keep your application tasks, requirements, and deadlines together.</p>
+                </article>
+
+                <article class="step">
+                    <span class="step-number">03</span>
+                    <h3>Apply</h3>
+                    <p>Use the official school websites to continue your application.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section" id="features">
+        <div class="section-inner">
+            <h2>Built around students</h2>
+            <p class="section-intro">Everything is designed to make the college search process easier to follow.</p>
+
+            <div class="feature-grid">
+                <article class="feature-card">
+                    <h3>College discovery</h3>
+                    <p>Find universities and visit their official websites directly.</p>
+                </article>
+
+                <article class="feature-card">
+                    <h3>Application tracking</h3>
+                    <p>Keep track of the schools you are interested in and your progress.</p>
+                </article>
+
+                <article class="feature-card">
+                    <h3>Organized requirements</h3>
+                    <p>Keep important application tasks and deadlines easier to manage.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="home-footer">
+    © 2026 WebEnroll · <a href="privacy-policy.html" style="color:inherit;text-decoration:underline;">Privacy Policy</a>
+</footer>
+
+<script type="module" src="js/authGuard.js"></script>
+<script src="js/app.js"></script>
+<script src="js/cookie-consent.js"></script>
+
+</body>
+</html>

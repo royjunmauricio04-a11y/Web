@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Profile | WebEnroll</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #1c2530;
+            --muted: #5c6874;
+            --paper: #f5f6f2;
+            --navy: #1c3a5e;
+            --navy-dark: #12253c;
+            --gold: #b8842a;
+            --line: #dce1da;
+        }
+        body { background: #ffffff; font-family: 'Public Sans', sans-serif; color: var(--ink); }
+        h1, h2, h3 { font-family: 'Fraunces', serif; font-weight: 600; }
+
+        .breadcrumb {
+            width: min(760px, calc(100% - 32px));
+            margin: 18px auto 0;
+            font-size: 13px;
+            color: var(--muted);
+        }
+        .breadcrumb a { color: var(--muted); text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        .profile-hero {
+            width: min(760px, calc(100% - 32px));
+            margin: 14px auto 0;
+            background: var(--paper);
+            border-radius: 8px;
+            padding: 24px 26px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            border: 1px solid var(--line);
+        }
+        .profile-hero h1 {
+            margin: 0;
+            font-size: clamp(22px, 4vw, 30px);
+            color: var(--ink);
+            letter-spacing: -0.3px;
+        }
+        .profile-hero-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .profile-hero-buttons a {
+            padding: 12px 22px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        .btn-apply { background: var(--navy); color: #fff; }
+        .btn-apply:hover { background: var(--navy-dark); }
+        .btn-website { background: #fff; color: var(--navy); border: 1px solid var(--navy); }
+        .btn-website:hover { background: var(--paper); }
+
+        .profile-banner-wrap {
+            width: min(760px, calc(100% - 32px));
+            margin: 18px auto 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .profile-banner {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            display: block;
+        }
+        .profile-banner-placeholder {
+            width: 100%;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .profile-banner-placeholder span {
+            font-family: 'Fraunces', serif;
+            color: #fff;
+            font-size: 22px;
+            letter-spacing: 3px;
+            border: 1px solid rgba(255,255,255,0.55);
+            padding: 10px 20px;
+            border-radius: 4px;
+        }
+
+        .profile-body {
+            width: min(760px, calc(100% - 32px));
+            margin: 0 auto 100px;
+        }
+
+        .tag-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 20px 0;
+        }
+        .tag-pill {
+            background: #eef1ed;
+            color: var(--navy);
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 6px 13px;
+            border-radius: 4px;
+        }
+
+        .profile-section {
+            margin-top: 34px;
+        }
+        .profile-section h2 {
+            font-size: 20px;
+            color: var(--ink);
+            margin: 0 0 12px;
+        }
+        .profile-description {
+            color: var(--muted);
+            font-size: 14.5px;
+            line-height: 1.7;
+        }
+
+        .programs-grid {
+            columns: 2;
+            column-gap: 32px;
+        }
+        .programs-grid div {
+            break-inside: avoid;
+            padding: 6px 0;
+            font-size: 14px;
+            color: var(--ink);
+            border-bottom: 1px solid #f1f2ef;
+        }
+        .programs-grid div::before {
+            content: "—";
+            color: var(--gold);
+            margin-right: 8px;
+        }
+
+        .map-frame {
+            width: 100%;
+            height: 260px;
+            border: 0;
+            border-radius: 6px;
+            display: block;
+            margin-bottom: 8px;
+            border: 1px solid var(--line);
+        }
+        .map-link {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--navy);
+            text-decoration: none;
+        }
+
+        .email-card {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 14px;
+        }
+        .email-card label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 8px;
+        }
+        .email-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .email-row input {
+            flex: 1;
+            min-width: 200px;
+            padding: 11px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .email-row button {
+            padding: 11px 20px;
+            border: none;
+            border-radius: 6px;
+            background: var(--navy);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .email-success {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #1c7a34;
+            display: none;
+        }
+
+        #notFoundState {
+            text-align: center;
+            padding: 100px 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+        <a href="index.html" class="brand">WebEnroll</a>
+        <nav class="desktop-nav" id="desktopNav">
+            <a href="index.html">Home</a>
+            <a href="colleges.html">Find Colleges</a>
+        </nav>
+        <div class="header-actions" id="headerActions">
+            <a href="login.html" class="login-link">Sign In</a>
+            <a href="signup.html" class="primary-button small">Get Started</a>
+        </div>
+        <button class="menu-button" id="menuButton" type="button" aria-label="Open menu">☰</button>
+    </div>
+</header>
+
+<div id="notFoundState">
+    <h2>College not found</h2>
+    <p style="color:#64748b;">This school may have been removed or the link is incorrect.</p>
+    <a href="colleges.html" class="primary-button small">Back to Find a College</a>
+</div>
+
+<div id="profileState" style="display:none;">
+    <p class="breadcrumb">
+        <a href="index.html">Home</a> &nbsp;›&nbsp; <a href="colleges.html">Find a College</a> &nbsp;›&nbsp; <span id="crumbName">School</span>
+    </p>
+
+    <div class="profile-hero">
+        <h1 id="heroName">School Name</h1>
+        <div class="profile-hero-buttons">
+            <a id="heroApplyBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-apply">Apply now</a>
+            <a id="heroWebsiteBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-website">Website</a>
+        </div>
+    </div>
+
+    <div class="profile-banner-wrap" id="bannerWrap"></div>
+
+    <div class="profile-body">
+        <div class="tag-pills" id="tagPills"></div>
+
+        <div class="profile-section">
+            <h2>About</h2>
+            <p class="profile-description" id="descriptionText"></p>
+        </div>
+
+        <div class="profile-section" id="programsSection">
+            <h2>Academic Programs</h2>
+            <div class="programs-grid" id="programsGrid"></div>
+        </div>
+
+        <div class="profile-section">
+            <h2>Location</h2>
+            <p class="profile-description" id="locationText" style="margin-bottom:10px;"></p>
+            <iframe id="mapFrame" class="map-frame" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <a id="mapLink" href="#" target="_blank" rel="noopener noreferrer" class="map-link">Open in Google Maps</a>
+        </div>
+
+        <div class="profile-section">
+            <h2>Application Information</h2>
+            <p class="profile-description">
+                Ready to apply? Use the button above to go straight to the official application portal, or get the link sent to your email below.
+            </p>
+            <div class="email-card">
+                <form id="emailForm">
+                    <label for="studentEmail">Send this school's application link to your email:</label>
+                    <div class="email-row">
+                        <input type="email" id="studentEmail" placeholder="Enter your email address" required>
+                        <button type="submit" id="emailSubmitBtn">Send Link</button>
+                    </div>
+                </form>
+                <div class="email-success" id="emailSuccess"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="js/authGuard.js"></script>
+<script src="js/cookie-consent.js"></script>
+<script type="module">
+    import { db } from "./js/firebase-config.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { trackTaskStart, trackTaskComplete, trackError } from "./js/analytics.js";
+
+    // Same starter data as colleges.html — used if Firestore has nothing yet
+    // for this ID (e.g. "Seed Default 8 Colleges" hasn't been run, or rules
+    // aren't published), so a card never links to a dead page.
+    const FALLBACK_COLLEGES = {
+        pup: { name: "Polytechnic University of the Philippines", shortName: "PUP", location: "Sta. Mesa, Manila", city: "Manila", strand: "ICT STEM ABM HUMSS", mapQuery: "Polytechnic University of the Philippines, Anonas St, Sta. Mesa, Manila", website: "https://www.pup.edu.ph/", applyUrl: "https://www.pup.edu.ph/iapply/", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/PUP_Main_Academic_Bldg.jpg/640px-PUP_Main_Academic_Bldg.jpg", color: "#7c2d12", description: "National polytechnic state university known for Computer Science, Information Technology, and Engineering. Applicants create an account on the iApply portal to submit their application online.", programs: "Computer Science, Information Technology, Business Administration, Accountancy, Civil Engineering, Political Science, Communication, Education", tags: "Public University, Co-Ed, Accepts Applicants" },
+        up: { name: "University of the Philippines (UP System)", shortName: "UP", location: "Diliman, Quezon City & Manila", city: "Quezon City", strand: "STEM ICT HUMSS ABM", mapQuery: "University of the Philippines Diliman, Quezon City", website: "https://up.edu.ph/", applyUrl: "https://upcat2027online.up.edu.ph/", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/UP_Diliman_Oblation.jpg/640px-UP_Diliman_Oblation.jpg", color: "#7f1d1d", description: "The premier state university system offering top-tier programs across Diliman (Quezon City) and Manila. Admission is through UPCAT.", programs: "Computer Science, Electrical Engineering, Political Science, Economics, Fine Arts, Biology, Psychology, Mass Communication", tags: "Public University, Co-Ed, Accepts Applicants, Highly Selective" },
+        tup: { name: "Technological University of the Philippines", shortName: "TUP", location: "Ayala Blvd, Ermita, Manila", city: "Manila", strand: "ICT STEM", mapQuery: "Technological University of the Philippines, Ayala Blvd, Ermita, Manila", website: "https://www.tup.edu.ph/", applyUrl: "https://ers.tup.edu.ph/aims/applicants/", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/TUP_Manila_IRT_Building.jpg/640px-TUP_Manila_IRT_Building.jpg", color: "#1e3a8a", description: "Premier state university for engineering, industrial technology, and computer studies.", programs: "Electrical Engineering, Mechanical Engineering, Civil Engineering, Computer Engineering, Industrial Technology, Architecture", tags: "Public University, Co-Ed, Accepts Applicants" },
+        pnu: { name: "Philippine Normal University", shortName: "PNU", location: "104 Taft Ave, Ermita, Manila", city: "Manila", strand: "HUMSS ABM", mapQuery: "Philippine Normal University, 104 Taft Ave, Ermita, Manila", website: "https://www.pnu.edu.ph/", applyUrl: "https://eservices.pnu.edu.ph/login", image: "", color: "#1d4ed8", description: "The Philippines' National Center for Teacher Education.", programs: "Elementary Education, Secondary Education, Early Childhood Education, Special Needs Education, Physical Education", tags: "Public University, Co-Ed, Teacher Education" },
+        rtu: { name: "Rizal Technological University", shortName: "RTU", location: "Boni Ave, Mandaluyong City", city: "Mandaluyong", strand: "ICT STEM", mapQuery: "Rizal Technological University, Boni Avenue, Mandaluyong City", website: "https://www.rtu.edu.ph/", applyUrl: "https://www.rtu.edu.ph/other-downloads/", image: "", color: "#0f766e", description: "State university focused on architecture, engineering, and technology programs.", programs: "Architecture, Civil Engineering, Electronics Engineering, Information Technology, Industrial Education", tags: "Public University, Co-Ed, Accepts Applicants" },
+        earist: { name: "Eulogio \"Amang\" Rodriguez Institute of Science and Technology", shortName: "EARIST", location: "Nagtahan St, Sampaloc, Manila", city: "Manila", strand: "ICT STEM TVL", mapQuery: "EARIST, Nagtahan St, Sampaloc, Manila", website: "https://earist.edu.ph/", applyUrl: "https://earistweb.pinnacle.com.ph/aims/applicants/", image: "", color: "#92400e", description: "State institute of science and technology in Sampaloc, Manila.", programs: "Information Technology, Electronics Engineering, Industrial Technology, Hospitality Management, Education", tags: "Public University, Co-Ed, Accepts Applicants" },
+        naap: { name: "National Aviation Academy of the Philippines (formerly PhilSCA)", shortName: "NAAP", location: "Villamor Air Base, Pasay City", city: "Pasay", strand: "STEM", mapQuery: "National Aviation Academy of the Philippines, Villamor, Pasay City", website: "https://naap.edu.ph/", applyUrl: "https://naap.edu.ph/registrars-office/", image: "", color: "#0369a1", description: "The Philippines' national aviation state college (renamed NAAP in Sept 2025, formerly PhilSCA).", programs: "Aviation Electronics Technology, Aircraft Maintenance Technology, Air Traffic Management, Aviation Security", tags: "Public College, Co-Ed, Aviation Specialization" },
+        mpc: { name: "Marikina Polytechnic College", shortName: "MPC", location: "Sta. Elena, Marikina City", city: "Marikina", strand: "ICT TVL ABM", mapQuery: "Marikina Polytechnic College, Sta. Elena, Marikina City", website: "https://mpc.edu.ph", applyUrl: "https://sites.google.com/mpc.edu.ph/mpc-links/downloads?authuser=0", image: "", color: "#15803d", description: "City college offering affordable degree programs for Marikina residents.", programs: "Information Technology, Office Administration, Entrepreneurship, Hospitality Management", tags: "Public College, Co-Ed, Accepts Applicants" }
+    };
+
+    // Point this at wherever js/server.js is actually running.
+    const API_BASE_URL = "http://localhost:3000";
+
+    function initials(name) {
+        return name.split(/\s+/).filter(w => /^[A-Z]/.test(w)).map(w => w[0]).slice(0, 3).join('') || name.slice(0, 3).toUpperCase();
+    }
+
+    function handleBannerImgError(imgEl, shortName, color) {
+        const wrap = imgEl.parentElement;
+        wrap.innerHTML = `<div class="profile-banner-placeholder" style="background:linear-gradient(135deg, ${color}, ${color}dd);"><span>${shortName}</span></div>`;
+    }
+    window.handleBannerImgError = handleBannerImgError;
+
+    // Mobile menu (same behavior as other pages)
+    const menuButton = document.getElementById('menuButton');
+    const desktopNav = document.getElementById('desktopNav');
+    if (menuButton) {
+        menuButton.addEventListener('click', () => desktopNav.classList.toggle('active'));
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const collegeId = params.get('id');
+    let currentCollege = null;
+
+    async function loadCollege() {
+        if (!collegeId) {
+            document.getElementById('notFoundState').style.display = 'block';
+            return;
+        }
+        try {
+            const snap = await getDoc(doc(db, "colleges", collegeId));
+            if (snap.exists()) {
+                currentCollege = { id: snap.id, ...snap.data() };
+            } else if (FALLBACK_COLLEGES[collegeId]) {
+                currentCollege = { id: collegeId, ...FALLBACK_COLLEGES[collegeId] };
+            } else {
+                document.getElementById('notFoundState').style.display = 'block';
+                return;
+            }
+            renderCollege(currentCollege);
+            trackTaskStart('college_inquiry');
+        } catch (err) {
+            console.error("Could not load college from Firestore:", err);
+            if (FALLBACK_COLLEGES[collegeId]) {
+                currentCollege = { id: collegeId, ...FALLBACK_COLLEGES[collegeId] };
+                renderCollege(currentCollege);
+                trackTaskStart('college_inquiry');
+            } else {
+                document.getElementById('notFoundState').style.display = 'block';
+            }
+        }
+    }
+
+    function renderCollege(c) {
+        document.title = `${c.name} | WebEnroll`;
+        document.getElementById('crumbName').textContent = c.shortName || c.name;
+        document.getElementById('heroName').textContent = c.name;
+        document.getElementById('heroApplyBtn').href = c.applyUrl || '#';
+        document.getElementById('heroWebsiteBtn').href = c.website || '#';
+        document.getElementById('descriptionText').textContent = c.description || '';
+        document.getElementById('locationText').textContent = c.location || '';
+
+        const bannerWrap = document.getElementById('bannerWrap');
+        const color = c.color || '#1c3a5e';
+        bannerWrap.innerHTML = c.image
+            ? `<img class="profile-banner" src="${c.image}" alt="${c.shortName || c.name}" onerror="window.handleBannerImgError(this, '${(c.shortName || initials(c.name)).replace(/'/g, "\\'")}', '${color}')">`
+            : `<div class="profile-banner-placeholder" style="background:linear-gradient(135deg, ${color}, ${color}dd);"><span>${c.shortName || initials(c.name)}</span></div>`;
+
+        // Tag pills: city, strand tags, and any custom tags field
+        const pills = [];
+        if (c.city) pills.push(c.city);
+        if (c.strand) c.strand.split(/\s+/).forEach(s => pills.push(s));
+        if (c.tags) c.tags.split(',').map(t => t.trim()).filter(Boolean).forEach(t => pills.push(t));
+        document.getElementById('tagPills').innerHTML = pills.map(p => `<span class="tag-pill">${p}</span>`).join('');
+
+        // Academic programs list
+        const programsSection = document.getElementById('programsSection');
+        const programsGrid = document.getElementById('programsGrid');
+        const programs = c.programs ? c.programs.split(',').map(p => p.trim()).filter(Boolean) : [];
+        if (programs.length) {
+            programsGrid.innerHTML = programs.map(p => `<div>${p}</div>`).join('');
+            programsSection.style.display = 'block';
+        } else {
+            programsSection.style.display = 'none';
+        }
+
+        // Map
+        const mapQuery = encodeURIComponent(c.mapQuery || c.name);
+        document.getElementById('mapFrame').src = `https://maps.google.com/maps?q=${mapQuery}&output=embed`;
+        document.getElementById('mapLink').href = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
+
+        document.getElementById('profileState').style.display = 'block';
+    }
+
+    document.getElementById('emailForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('studentEmail').value.trim();
+        const submitBtn = document.getElementById('emailSubmitBtn');
+        const successEl = document.getElementById('emailSuccess');
+        if (!currentCollege) return;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        successEl.style.display = 'none';
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/send-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email,
+                    college: currentCollege.name,
+                    applyUrl: currentCollege.applyUrl,
+                    website: currentCollege.website
+                })
+            });
+            const data = await response.json();
+
+            successEl.style.display = 'block';
+            if (data.success) {
+                successEl.style.color = '#1c7a34';
+                successEl.textContent = 'Sent! Check your inbox.';
+                e.target.reset();
+                trackTaskComplete('college_inquiry');
+            } else {
+                successEl.style.color = '#c0392b';
+                successEl.textContent = data.message || 'Something went wrong. Please try again.';
+                trackError('college_inquiry', data.message || 'send failed');
+            }
+        } catch (err) {
+            console.error('Email send error:', err);
+            successEl.style.display = 'block';
+            successEl.style.color = '#c0392b';
+            successEl.textContent = 'Could not reach the server. Please try again later.';
+            trackError('college_inquiry', err.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Link';
+        }
+    });
+
+    loadCollege();
+</script>
+
+</body>
+</html>

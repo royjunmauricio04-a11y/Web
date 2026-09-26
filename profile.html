@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | WebEnroll</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .profile-main {
+            background: #f8fafc;
+            min-height: calc(100vh - 140px);
+            padding: 40px 20px;
+        }
+
+        .profile-grid {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 24px;
+        }
+
+        .profile-card {
+            background: #ffffff;
+            border: 1px solid #dfe4ea;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            margin-bottom: 24px;
+        }
+
+        .avatar-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: #1f56c5;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .user-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0 0 4px;
+            color: #20252d;
+        }
+
+        .user-email {
+            color: #68717d;
+            font-size: 14px;
+            margin: 0 0 16px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #eef2ff;
+            color: #1f56c5;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 0 16px;
+            color: #20252d;
+            border-bottom: 1px solid #e8ebef;
+            padding-bottom: 8px;
+        }
+
+        /* Checklist Styles */
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* Saved Schools Styles */
+        .saved-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .saved-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .saved-item:last-child {
+            border-bottom: none;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 10px;
+            background: #dc2626;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        .logout-btn:hover {
+            background: #b91c1c;
+        }
+
+        @media (max-width: 768px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+        <a href="index.html" class="brand">WebEnroll</a>
+        <a href="index.html" class="auth-exit">Back to Home</a>
+    </div>
+</header>
+
+<main class="profile-main">
+    <div class="profile-grid">
+        
+        <!-- SIDEBAR: USER DETAILS -->
+        <aside>
+            <div class="profile-card">
+                <div class="avatar-circle" id="userAvatar">U</div>
+                <h1 class="user-name" id="userName">Student Name</h1>
+                <p class="user-email" id="userEmail">email@example.com</p>
+                <span class="badge" id="userTrack">TVL - ICT Student</span>
+
+                <button type="button" class="logout-btn" id="logoutBtn">Log Out</button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT: FEATURES -->
+        <section>
+            
+            <!-- FEATURE 1: APPLICATION REQUIREMENTS CHECKLIST -->
+            <div class="profile-card">
+                <h2 class="section-title">Application Requirements Tracker</h2>
+                <div class="checklist">
+                    <label class="checklist-item">
+                        <input type="checkbox" id="req1">
+                        <span>Form 137 / Report Card</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" id="req2">
+                        <span>Good Moral Certificate</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" id="req3">
+                        <span>PSA Birth Certificate</span>
+                    </label>
+                    <label class="checklist-item">
+                        <input type="checkbox" id="req4">
+                        <span>2x2 ID Pictures</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- FEATURE 3: SAVED COLLEGES -->
+            <div class="profile-card">
+                <h2 class="section-title">Saved Universities</h2>
+                <ul class="saved-list" id="savedCollegesList">
+                    <li class="saved-item">
+                        <span>Polytechnic University of the Philippines (PUP)</span>
+                        <a href="colleges.html" class="primary-button small">View</a>
+                    </li>
+                    <li class="saved-item">
+                        <span>Pamantasan ng Lungsod ng Valenzuela (PLV)</span>
+                        <a href="colleges.html" class="primary-button small">View</a>
+                    </li>
+                </ul>
+            </div>
+
+        </section>
+
+    </div>
+</main>
+
+<script type="module" src="js/authGuard.js"></script>
+<script src="js/cookie-consent.js"></script>
+<script>
+    // authGuard.js fires this once it has checked Firebase and (if needed)
+    // loaded the student's Firestore profile document.
+    document.addEventListener('authReady', (e) => {
+        const profile = e.detail.profile || {};
+        const authEmail = e.detail.user ? e.detail.user.email : null;
+
+        const rawName = profile.firstName || profile.fullName || profile.name || "Student Name";
+        const firstName = rawName.trim().split(" ")[0];
+        const lastName = profile.lastName || (rawName.split(" ").length > 1 ? rawName.split(" ").slice(1).join(" ") : "");
+        const email = profile.email || authEmail || "email@example.com";
+        const strand = profile.strand || (profile.interests && profile.interests[0]) || "TVL - ICT Student";
+
+        const userNameEl = document.getElementById('userName');
+        const userEmailEl = document.getElementById('userEmail');
+        const userAvatarEl = document.getElementById('userAvatar');
+        const userTrackEl = document.getElementById('userTrack');
+
+        if (userNameEl) userNameEl.textContent = `${firstName} ${lastName}`.trim();
+        if (userEmailEl) userEmailEl.textContent = email;
+        if (userAvatarEl) userAvatarEl.textContent = firstName.charAt(0).toUpperCase();
+        if (userTrackEl) userTrackEl.textContent = `${strand} Student`;
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Save Checklist Progress in LocalStorage
+        const checkboxes = document.querySelectorAll('.checklist-item input');
+        checkboxes.forEach((chk, index) => {
+            const savedState = localStorage.getItem(`req_state_${index}`);
+            if (savedState === 'true') chk.checked = true;
+
+            chk.addEventListener('change', () => {
+                localStorage.setItem(`req_state_${index}`, chk.checked);
+            });
+        });
+
+        // Logout Listener
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                AuthController.clearSession();
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

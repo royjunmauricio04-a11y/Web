@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | Webappname.</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body class="auth-page">
+
+<header class="site-header">
+    <div class="header-inner">
+        <a href="index.html" class="brand">Name of the site</a>
+        <a href="index.html" class="auth-exit">Exit</a>
+    </div>
+</header>
+
+<main class="auth-main">
+    <section class="auth-card">
+        <div class="auth-heading">
+            <span class="auth-eyebrow">WELCOME BACK</span>
+            <h1>Sign in</h1>
+            <p>Sign in to continue your college application journey.</p>
+        </div>
+
+        <form id="loginForm" novalidate>
+            <div class="field">
+                <label for="email">Email address</label>
+                <input id="email" name="email" type="email" autocomplete="email" placeholder="Enter your email address" required>
+            </div>
+
+            <div class="field">
+                <div class="password-label">
+                    <label for="password">Password</label>
+                    <a href="#" id="forgotPassword">Forgot password?</a>
+                </div>
+                <div class="password-input">
+                    <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+                    <button type="button" id="togglePassword" class="password-toggle" aria-label="Show password">Show</button>
+                </div>
+            </div>
+
+            <label class="remember-me">
+                <input type="checkbox" id="remember" name="remember">
+                <span>Remember me</span>
+            </label>
+
+            <div id="loginError" class="form-error" role="alert" aria-live="polite" hidden></div>
+
+            <button type="submit" class="create-button auth-submit">Sign in</button>
+        </form>
+
+        <div class="auth-divider">
+            <span>or</span>
+        </div>
+
+        <div class="auth-create">
+            <span>Don't have an account?</span>
+            <a href="signup.html">Create an account</a>
+        </div>
+    </section>
+</main>
+
+<script type="module" src="js/authGuard.js"></script>
+<script type="module" src="js/auth.js"></script>
+<script src="js/cookie-consent.js"></script>
+</body>
+</html>
