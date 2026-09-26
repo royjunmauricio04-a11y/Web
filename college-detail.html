@@ -414,13 +414,6 @@
         submitBtn.textContent = 'Sending...';
         successEl.style.display = 'none';
 
-        // Render's free tier puts the server to sleep after ~15 min of no
-        // traffic, so the FIRST request after a while can take 30-60s to
-        // wake it up. We give it up to 45s before giving up, instead of
-        // letting the button say "Sending..." forever with no feedback.
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 45000);
-
         try {
             const response = await fetch(`${API_BASE_URL}/api/send-email`, {
                 method: 'POST',
@@ -430,14 +423,8 @@
                     college: currentCollege.name,
                     applyUrl: currentCollege.applyUrl,
                     website: currentCollege.website
-                }),
-                signal: controller.signal
+                })
             });
-            clearTimeout(timeoutId);
-
-            if (!response.ok) {
-                throw new Error(`Server responded with ${response.status}`);
-            }
             const data = await response.json();
 
             successEl.style.display = 'block';
@@ -452,13 +439,10 @@
                 trackError('college_inquiry', data.message || 'send failed');
             }
         } catch (err) {
-            clearTimeout(timeoutId);
             console.error('Email send error:', err);
             successEl.style.display = 'block';
             successEl.style.color = '#c0392b';
-            successEl.textContent = (err.name === 'AbortError')
-                ? "The server took too long to respond (it may be asleep — try again in a minute)."
-                : 'Could not reach the server. Please try again later.';
+            successEl.textContent = 'Could not reach the server. Please try again later.';
             trackError('college_inquiry', err.message);
         } finally {
             submitBtn.disabled = false;
