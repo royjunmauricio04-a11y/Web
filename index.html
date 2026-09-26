@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home | Dashboard</title>
+    <title>Home | COMPASS</title>
     <link rel="stylesheet" href="css/styles.css">
 
     <style>
@@ -157,7 +157,7 @@
 
 <header class="site-header">
     <div class="header-inner">
-        <a href="index.html" class="brand">WebEnroll</a>
+        <a href="index.html" class="brand">COMPASS</a>
 
         <nav class="desktop-nav" id="desktopNav">
             <a href="index.html">Home</a>
@@ -195,8 +195,8 @@
     <!-- HERO -->
     <section class="hero">
         <div class="hero-content">
-            <h1>Your next step starts here.</h1>
-            <p>Explore colleges, organize your application journey, and keep the important details in one place.</p>
+            <h1 id="heroTitle">Your next step starts here.</h1>
+            <p id="heroSubtitle">Explore colleges, organize your application journey, and keep the important details in one place.</p>
 
             <div class="hero-actions">
                 <a href="colleges.html" class="primary-button">Find a College</a>
@@ -209,25 +209,25 @@
     <section class="section" id="how-it-works">
         <div class="section-inner">
             <h2>How it works</h2>
-            <p class="section-intro">WebEnroll gives students a simple way to discover schools and organize the next steps in their college journey.</p>
+            <p class="section-intro" id="howItWorksIntro">COMPASS gives students a simple way to discover schools and organize the next steps in their college journey.</p>
 
             <div class="steps">
                 <article class="step">
                     <span class="step-number">01</span>
-                    <h3>Explore</h3>
-                    <p>Browse colleges and universities that match what you are looking for.</p>
+                    <h3 id="step1Title">Explore</h3>
+                    <p id="step1Desc">Browse colleges and universities that match what you are looking for.</p>
                 </article>
 
                 <article class="step">
                     <span class="step-number">02</span>
-                    <h3>Organize</h3>
-                    <p>Keep your application tasks, requirements, and deadlines together.</p>
+                    <h3 id="step2Title">Organize</h3>
+                    <p id="step2Desc">Keep your application tasks, requirements, and deadlines together.</p>
                 </article>
 
                 <article class="step">
                     <span class="step-number">03</span>
-                    <h3>Apply</h3>
-                    <p>Use the official school websites to continue your application.</p>
+                    <h3 id="step3Title">Apply</h3>
+                    <p id="step3Desc">Use the official school websites to continue your application.</p>
                 </article>
             </div>
         </div>
@@ -237,22 +237,22 @@
     <section class="section" id="features">
         <div class="section-inner">
             <h2>Built around students</h2>
-            <p class="section-intro">Everything is designed to make the college search process easier to follow.</p>
+            <p class="section-intro" id="featuresIntro">Everything is designed to make the college search process easier to follow.</p>
 
             <div class="feature-grid">
                 <article class="feature-card">
-                    <h3>College discovery</h3>
-                    <p>Find universities and visit their official websites directly.</p>
+                    <h3 id="feature1Title">College discovery</h3>
+                    <p id="feature1Desc">Find universities and visit their official websites directly.</p>
                 </article>
 
                 <article class="feature-card">
-                    <h3>Application tracking</h3>
-                    <p>Keep track of the schools you are interested in and your progress.</p>
+                    <h3 id="feature2Title">Application tracking</h3>
+                    <p id="feature2Desc">Keep track of the schools you are interested in and your progress.</p>
                 </article>
 
                 <article class="feature-card">
-                    <h3>Organized requirements</h3>
-                    <p>Keep important application tasks and deadlines easier to manage.</p>
+                    <h3 id="feature3Title">Organized requirements</h3>
+                    <p id="feature3Desc">Keep important application tasks and deadlines easier to manage.</p>
                 </article>
             </div>
         </div>
@@ -260,12 +260,54 @@
 </main>
 
 <footer class="home-footer">
-    © 2026 WebEnroll · <a href="privacy-policy.html" style="color:inherit;text-decoration:underline;">Privacy Policy</a>
+    © 2026 COMPASS · <a href="privacy-policy.html" style="color:inherit;text-decoration:underline;">Privacy Policy</a>
 </footer>
 
 <script type="module" src="js/authGuard.js"></script>
 <script src="js/app.js"></script>
 <script src="js/cookie-consent.js"></script>
+<script type="module">
+    // Pulls editable homepage copy from Firestore (settings/homepage), set
+    // from the Admin Dashboard's "Site Content" tab. Any field left blank
+    // there, or missing entirely (first run, before an admin has edited
+    // anything), just keeps the default text already written into this
+    // HTML — nothing ever goes blank.
+    import { db } from "./js/firebase-config.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    function setTextIfPresent(id, value) {
+        if (!value) return;
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    }
+
+    (async () => {
+        try {
+            const snap = await getDoc(doc(db, "settings", "homepage"));
+            if (!snap.exists()) return;
+            const c = snap.data();
+
+            setTextIfPresent("heroTitle", c.heroTitle);
+            setTextIfPresent("heroSubtitle", c.heroSubtitle);
+            setTextIfPresent("howItWorksIntro", c.howItWorksIntro);
+            setTextIfPresent("step1Title", c.step1Title);
+            setTextIfPresent("step1Desc", c.step1Desc);
+            setTextIfPresent("step2Title", c.step2Title);
+            setTextIfPresent("step2Desc", c.step2Desc);
+            setTextIfPresent("step3Title", c.step3Title);
+            setTextIfPresent("step3Desc", c.step3Desc);
+            setTextIfPresent("featuresIntro", c.featuresIntro);
+            setTextIfPresent("feature1Title", c.feature1Title);
+            setTextIfPresent("feature1Desc", c.feature1Desc);
+            setTextIfPresent("feature2Title", c.feature2Title);
+            setTextIfPresent("feature2Desc", c.feature2Desc);
+            setTextIfPresent("feature3Title", c.feature3Title);
+            setTextIfPresent("feature3Desc", c.feature3Desc);
+        } catch (err) {
+            console.error("Could not load homepage content, showing defaults:", err);
+        }
+    })();
+</script>
 
 </body>
 </html>

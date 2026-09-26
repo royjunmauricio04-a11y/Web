@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Colleges | WebEnroll</title>
+    <title>Find Colleges | COMPASS</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -324,7 +324,7 @@
 
     <header class="site-header">
         <div class="header-inner">
-            <a href="index.html" class="brand">WebEnroll</a>
+            <a href="index.html" class="brand">COMPASS</a>
             <nav class="desktop-nav" id="desktopNav">
                 <a href="index.html">Home</a>
                 <a href="colleges.html">Find Colleges</a>
@@ -406,16 +406,26 @@
 </script>
 <script src="js/cookie-consent.js"></script>
 <script type="module">
-    // Prefill the "send to my email" field once we know who's logged in.
+    // Prefill the "send to my email" field, and remember who's logged in
+    // (plus their already-saved colleges) once authGuard.js finishes checking.
     document.addEventListener('authReady', (e) => {
         const studentEmailInput = document.getElementById('studentEmail');
         if (studentEmailInput && e.detail.user && e.detail.user.email) {
             studentEmailInput.value = e.detail.user.email;
         }
+
+        currentUserId = e.detail.user ? e.detail.user.uid : null;
+        savedCollegeIds = (e.detail.profile && e.detail.profile.savedColleges) || [];
+        updateSaveButtonsUI();
     });
 
-    import { db } from "./js/firebase-config.js";
-    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { auth, db } from "./js/firebase-config.js";
+    import { collection, getDocs, doc, updateDoc, getDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Which college IDs the logged-in student has already saved (for the
+    // Save button state) — filled in once authGuard fires "authReady".
+    let currentUserId = null;
+    let savedCollegeIds = [];
 
     // ==========================================================
     // COLLEGE DATA
@@ -614,6 +624,7 @@
             COLLEGES = FALLBACK_COLLEGES;
         }
         renderCollegeCards();
+        updateSaveButtonsUI();
     }
 
     loadColleges();
@@ -664,13 +675,47 @@
     if (strandFilter) strandFilter.addEventListener('change', filterColleges);
     if (locationFilter) locationFilter.addEventListener('change', filterColleges);
 
-    // Save Button Toggle
-    function toggleSaveCollege(btn) {
-        btn.classList.toggle('saved');
-        if (btn.classList.contains('saved')) {
-            btn.textContent = '✓ Saved';
-        } else {
-            btn.textContent = '+ Save';
+    // Save Button — persists to the student's Firestore user doc
+    // (users/{uid}.savedColleges array) so it survives refreshes and shows
+    // up on profile.html under "Saved Universities".
+    function updateSaveButtonsUI() {
+        document.querySelectorAll('#collegeList .college-card').forEach(card => {
+            const id = card.getAttribute('data-id');
+            const btn = card.querySelector('.save-card-btn');
+            if (!btn) return;
+            const isSaved = savedCollegeIds.includes(id);
+            btn.classList.toggle('saved', isSaved);
+            btn.textContent = isSaved ? '✓ Saved' : '+ Save';
+        });
+    }
+
+    async function toggleSaveCollege(btn) {
+        const card = btn.closest('.college-card');
+        const collegeId = card ? card.getAttribute('data-id') : null;
+        if (!collegeId) return;
+
+        if (!currentUserId) {
+            if (confirm('Please sign in to save colleges to your profile. Go to the sign-in page now?')) {
+                window.location.href = 'login.html';
+            }
+            return;
+        }
+
+        const wasSaved = savedCollegeIds.includes(collegeId);
+        btn.disabled = true;
+        try {
+            await updateDoc(doc(db, 'users', currentUserId), {
+                savedColleges: wasSaved ? arrayRemove(collegeId) : arrayUnion(collegeId)
+            });
+            savedCollegeIds = wasSaved
+                ? savedCollegeIds.filter(id => id !== collegeId)
+                : [...savedCollegeIds, collegeId];
+            updateSaveButtonsUI();
+        } catch (err) {
+            console.error('Could not update saved colleges:', err);
+            alert('Could not save this college right now. Please try again.');
+        } finally {
+            btn.disabled = false;
         }
     }
 
