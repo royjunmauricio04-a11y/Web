@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile | WebEnroll</title>
+    <title>My Profile | COMPASS</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
         .profile-main {
@@ -132,13 +132,89 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Empty states */
+        .empty-state {
+            color: #94a3b8;
+            font-size: 13px;
+            padding: 12px 0;
+        }
+
+        /* Saved colleges remove button */
+        .remove-saved-btn {
+            background: none;
+            border: none;
+            color: #c0392b;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .remove-saved-btn:hover { text-decoration: underline; }
+
+        /* Applications table */
+        .applications-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .applications-table th {
+            text-align: left;
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 6px 8px;
+            border-bottom: 1px solid #e8ebef;
+        }
+        .applications-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+        .status-badge.pending { background: #fff7e6; color: #b7791f; }
+        .status-badge.approved { background: #e7f8ee; color: #1c7a34; }
+        .status-badge.rejected { background: #fdecec; color: #c0392b; }
+
+        /* Document upload rows */
+        .doc-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
+        }
+        .doc-row:last-child { border-bottom: none; }
+        .doc-row-label { color: #4b5563; font-weight: 600; }
+        .doc-row-status { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+        .doc-upload-btn {
+            background: #eef2ff;
+            color: #1f56c5;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .doc-upload-btn:hover { background: #dfe6ff; }
     </style>
 </head>
 <body>
 
 <header class="site-header">
     <div class="header-inner">
-        <a href="index.html" class="brand">WebEnroll</a>
+        <a href="index.html" class="brand">COMPASS</a>
         <a href="index.html" class="auth-exit">Back to Home</a>
     </div>
 </header>
@@ -184,19 +260,60 @@
                 </div>
             </div>
 
-            <!-- FEATURE 3: SAVED COLLEGES -->
+            <!-- FEATURE: DOCUMENT UPLOAD (TOR / Enrollment Form / TCR) -->
+            <div class="profile-card">
+                <h2 class="section-title">Upload Documents</h2>
+                <div class="doc-row">
+                    <div>
+                        <div class="doc-row-label">Transcript of Records (TOR)</div>
+                        <div class="doc-row-status" id="torStatus">No file uploaded yet.</div>
+                    </div>
+                    <label class="doc-upload-btn">
+                        Upload
+                        <input type="file" id="torInput" accept=".pdf,image/*" hidden>
+                    </label>
+                </div>
+                <div class="doc-row">
+                    <div>
+                        <div class="doc-row-label">Enrollment Form (EF)</div>
+                        <div class="doc-row-status" id="efStatus">No file uploaded yet.</div>
+                    </div>
+                    <label class="doc-upload-btn">
+                        Upload
+                        <input type="file" id="efInput" accept=".pdf,image/*" hidden>
+                    </label>
+                </div>
+                <div class="doc-row">
+                    <div>
+                        <div class="doc-row-label">Transfer Credential (TCR)</div>
+                        <div class="doc-row-status" id="tcrStatus">No file uploaded yet.</div>
+                    </div>
+                    <label class="doc-upload-btn">
+                        Upload
+                        <input type="file" id="tcrInput" accept=".pdf,image/*" hidden>
+                    </label>
+                </div>
+            </div>
+
+            <!-- FEATURE: SAVED COLLEGES (real, from Firestore) -->
             <div class="profile-card">
                 <h2 class="section-title">Saved Universities</h2>
                 <ul class="saved-list" id="savedCollegesList">
-                    <li class="saved-item">
-                        <span>Polytechnic University of the Philippines (PUP)</span>
-                        <a href="colleges.html" class="primary-button small">View</a>
-                    </li>
-                    <li class="saved-item">
-                        <span>Pamantasan ng Lungsod ng Valenzuela (PLV)</span>
-                        <a href="colleges.html" class="primary-button small">View</a>
-                    </li>
+                    <li class="empty-state">Loading...</li>
                 </ul>
+            </div>
+
+            <!-- FEATURE: MY APPLICATIONS (real, from Firestore, no fake data) -->
+            <div class="profile-card">
+                <h2 class="section-title">My Applications</h2>
+                <table class="applications-table">
+                    <thead>
+                        <tr><th>ID</th><th>College</th><th>Date</th><th>Status</th></tr>
+                    </thead>
+                    <tbody id="user-applications-list">
+                        <tr><td colspan="4" class="empty-state">Loading...</td></tr>
+                    </tbody>
+                </table>
             </div>
 
         </section>
@@ -206,51 +323,8 @@
 
 <script type="module" src="js/authGuard.js"></script>
 <script src="js/cookie-consent.js"></script>
-<script>
-    // authGuard.js fires this once it has checked Firebase and (if needed)
-    // loaded the student's Firestore profile document.
-    document.addEventListener('authReady', (e) => {
-        const profile = e.detail.profile || {};
-        const authEmail = e.detail.user ? e.detail.user.email : null;
-
-        const rawName = profile.firstName || profile.fullName || profile.name || "Student Name";
-        const firstName = rawName.trim().split(" ")[0];
-        const lastName = profile.lastName || (rawName.split(" ").length > 1 ? rawName.split(" ").slice(1).join(" ") : "");
-        const email = profile.email || authEmail || "email@example.com";
-        const strand = profile.strand || (profile.interests && profile.interests[0]) || "TVL - ICT Student";
-
-        const userNameEl = document.getElementById('userName');
-        const userEmailEl = document.getElementById('userEmail');
-        const userAvatarEl = document.getElementById('userAvatar');
-        const userTrackEl = document.getElementById('userTrack');
-
-        if (userNameEl) userNameEl.textContent = `${firstName} ${lastName}`.trim();
-        if (userEmailEl) userEmailEl.textContent = email;
-        if (userAvatarEl) userAvatarEl.textContent = firstName.charAt(0).toUpperCase();
-        if (userTrackEl) userTrackEl.textContent = `${strand} Student`;
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        // Save Checklist Progress in LocalStorage
-        const checkboxes = document.querySelectorAll('.checklist-item input');
-        checkboxes.forEach((chk, index) => {
-            const savedState = localStorage.getItem(`req_state_${index}`);
-            if (savedState === 'true') chk.checked = true;
-
-            chk.addEventListener('change', () => {
-                localStorage.setItem(`req_state_${index}`, chk.checked);
-            });
-        });
-
-        // Logout Listener
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                AuthController.clearSession();
-            });
-        }
-    });
-</script>
+<script type="module" src="js/profile.js"></script>
+<script type="module" src="js/documents.js"></script>
 
 </body>
 </html>

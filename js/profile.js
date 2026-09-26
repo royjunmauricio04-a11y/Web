@@ -1,170 +1,169 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+// js/profile.js
+// Real profile-page logic for a logged-in student:
+//   - Header info (name/email/avatar/track) from the Firestore profile
+//     authGuard.js already fetched (no second Firebase app, no duplication).
+//   - Requirements checklist, saved per-device in localStorage.
+//   - Saved Colleges: real Firestore array (users/{uid}.savedColleges),
+//     kept in sync with the Save button on colleges.html.
+//   - My Applications: real Firestore query against "applications" — shows
+//     an honest empty state instead of fake demo rows when there's nothing.
+//   - Logout, via the AuthController authGuard.js exposes on window.
 
-// Firebase Configuration ng WebEnroll App
-const firebaseConfig = {
-  apiKey: "AIzaSyC2NADIO_38zC6TadCHPZpilaOacTFiJ4A",
-  authDomain: "webenrollapp.firebaseapp.com",
-  projectId: "webenrollapp",
-  storageBucket: "webenrollapp.firebasestorage.app",
-  messagingSenderId: "563093291937",
-  appId: "1:563093291937:web:cefe2c21e185f9fcf501e0",
-  measurementId: "G-YK6ED35JMS"
-};
+import { db } from "./firebase-config.js";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  arrayRemove,
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+let currentUser = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+// authGuard.js fires this once it has checked Firebase auth state and (for
+// protected pages) loaded the student's Firestore profile document.
+document.addEventListener("authReady", async (e) => {
+  currentUser = e.detail.user;
+  if (!currentUser) return; // authGuard.js already redirects to login.html
 
-    // 1. Firebase Auth Observer: Siguraduhing naka-login ang user
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            await loadUserProfile(user);
-            await renderUserApplications(user.email);
-        } else {
-            // Pag hindi naka-login, ibalik sa login page
-            window.location.href = 'login.html';
-        }
-    });
-
-    // 2. Application Requirements Tracker (Save/Load Checkbox state)
-    setupChecklistTracker();
-
-    // 3. Logout Handler
-    const logoutBtn = document.getElementById('logoutBtn') || document.getElementById('btn-logout');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            const confirmLogout = confirm("Sigurado ka bang gusto mong mag-logout?");
-            if (confirmLogout) {
-                try {
-                    await signOut(auth);
-                    localStorage.removeItem('currentUser');
-                    window.location.href = 'login.html';
-                } catch (error) {
-                    console.error("Logout Error:", error);
-                    alert("Error sa pag-logout: " + error.message);
-                }
-            }
-        });
-    }
+  const profile = e.detail.profile || {};
+  renderHeader(currentUser, profile);
+  await renderSavedColleges(profile.savedColleges || []);
+  await renderApplications(currentUser.email);
 });
 
-// Load Profile details mula sa Firestore at Auth user
-async function loadUserProfile(authUser) {
-    const userEmail = authUser.email || 'student@example.com';
-    const initial = userEmail.charAt(0).toUpperCase();
+document.addEventListener("DOMContentLoaded", () => {
+  setupChecklistTracker();
 
-    let userData = {
-        id: authUser.uid,
-        email: userEmail,
-        fullName: userEmail.split('@')[0],
-        track: 'TVL - ICT Student'
-    };
-
-    try {
-        const userRef = doc(db, "users", authUser.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-            const firestoreData = userSnap.data();
-            const nameParts = [firestoreData.firstName, firestoreData.middleName, firestoreData.lastName].filter(Boolean).join(' ');
-            userData.fullName = nameParts || firestoreData.fullName || userData.fullName;
-            userData.id = firestoreData.lrn || authUser.uid;
-            
-            if (firestoreData.gradeLevel) {
-                userData.track = `${firestoreData.gradeLevel} Student`;
-            } else if (firestoreData.school) {
-                userData.track = firestoreData.school;
-            }
-        }
-    } catch (error) {
-        console.error("Error fetching Firestore user profile:", error);
-    }
-
-    // Populating elements (Sinuportahan ang dalawang uri ng HTML ID structure)
-    setElementText(['userName', 'profile-name'], userData.fullName);
-    setElementText(['userEmail', 'profile-email'], userData.email);
-    setElementText(['userAvatar', 'user-avatar'], initial);
-    setElementText(['userTrack', 'profile-role-badge'], userData.track);
-    setElementText(['profile-id'], userData.id);
-}
-
-// Checklist Progress Tracker
-function setupChecklistTracker() {
-    const checkboxes = document.querySelectorAll('.checklist-item input');
-    checkboxes.forEach((chk, index) => {
-        const savedState = localStorage.getItem(`req_state_${index}`);
-        if (savedState === 'true') chk.checked = true;
-
-        chk.addEventListener('change', () => {
-            localStorage.setItem(`req_state_${index}`, chk.checked);
-        });
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+      const confirmLogout = confirm("Sigurado ka bang gusto mong mag-logout?");
+      if (!confirmLogout) return;
+      if (window.AuthController) {
+        await window.AuthController.clearSession();
+      } else {
+        window.location.href = "login.html";
+      }
     });
+  }
+});
+
+function setText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
 }
 
-// Render Submitted Applications mula sa Firestore (o localStorage fallback)
-async function renderUserApplications(userEmail) {
-    const listContainer = document.getElementById('user-applications-list');
-    if (!listContainer) return;
+function renderHeader(user, profile) {
+  const rawName = profile.firstName || profile.fullName || profile.name || "Student Name";
+  const firstName = rawName.trim().split(" ")[0];
+  const lastName = profile.lastName || (rawName.trim().split(" ").length > 1 ? rawName.trim().split(" ").slice(1).join(" ") : "");
+  const email = profile.email || user.email || "email@example.com";
+  const strand = profile.strand || (profile.interests && profile.interests[0]) || "TVL - ICT Student";
 
-    let myApps = [];
-
-    try {
-        const appsQuery = query(collection(db, "applications"), where("studentEmail", "==", userEmail));
-        const querySnapshot = await getDocs(appsQuery);
-        querySnapshot.forEach((docSnap) => {
-            myApps.push({ id: docSnap.id, ...docSnap.data() });
-        });
-    } catch (error) {
-        console.warn("Firestore apps fetch failed, checking localStorage fallback...", error);
-    }
-
-    // Fallback sa localStorage kung wala pang record sa Firestore
-    if (myApps.length === 0) {
-        const allApplications = JSON.parse(localStorage.getItem('app_all_applications')) || [
-            { id: 'APP-101', studentEmail: userEmail, college: 'Department of Computer Science', status: 'Pending', date: '2026-02-15' },
-            { id: 'APP-102', studentEmail: userEmail, college: 'School of Business Analytics', status: 'Approved', date: '2026-02-14' }
-        ];
-        myApps = allApplications.filter(app => app.studentEmail === userEmail || app.studentName === userEmail);
-    }
-
-    if (myApps.length === 0) {
-        listContainer.innerHTML = `
-            <tr>
-                <td colspan="4" style="text-align: center; color: var(--text-muted, #64748b); padding: 1.5rem;">
-                    You have not submitted any enrollment applications yet.
-                </td>
-            </tr>
-        `;
-        return;
-    }
-
-    listContainer.innerHTML = myApps.map(app => `
-        <tr>
-            <td><strong>${app.id}</strong></td>
-            <td>${app.college || 'N/A'}</td>
-            <td>${app.date || 'Recently'}</td>
-            <td>
-                <span class="status-badge ${(app.status || 'pending').toLowerCase()}">
-                    ${app.status || 'Pending'}
-                </span>
-            </td>
-        </tr>
-    `).join('');
+  setText("userName", `${firstName} ${lastName}`.trim());
+  setText("userEmail", email);
+  setText("userAvatar", firstName.charAt(0).toUpperCase());
+  setText("userTrack", `${strand} Student`);
 }
 
-// Helper function para maglagay ng text gamit ang mga posibleng IDs
-function setElementText(ids, text) {
-    const idList = Array.isArray(ids) ? ids : [ids];
-    for (const id of idList) {
-        const el = document.getElementById(id);
-        if (el) {
-            el.textContent = text;
-            break;
-        }
-    }
+/* ---------------- Requirements checklist (per-device, localStorage) ---------------- */
+function setupChecklistTracker() {
+  const checkboxes = document.querySelectorAll(".checklist-item input");
+  checkboxes.forEach((chk, index) => {
+    const savedState = localStorage.getItem(`req_state_${index}`);
+    if (savedState === "true") chk.checked = true;
+
+    chk.addEventListener("change", () => {
+      localStorage.setItem(`req_state_${index}`, chk.checked);
+    });
+  });
+}
+
+/* ---------------- Saved colleges (real, Firestore-backed) ---------------- */
+async function renderSavedColleges(savedIds) {
+  const listEl = document.getElementById("savedCollegesList");
+  if (!listEl) return;
+
+  if (!savedIds.length) {
+    listEl.innerHTML = `<li class="empty-state">You haven't saved any colleges yet. <a href="colleges.html">Browse colleges</a> and tap "Save" on the ones you like.</li>`;
+    return;
+  }
+
+  // Look up display names from Firestore's "colleges" collection.
+  // Falls back to showing the raw ID if a name can't be found.
+  let collegesById = {};
+  try {
+    const snap = await getDocs(collection(db, "colleges"));
+    snap.forEach((d) => { collegesById[d.id] = d.data(); });
+  } catch (err) {
+    console.error("Could not load college names:", err);
+  }
+
+  listEl.innerHTML = savedIds.map((id) => {
+    const college = collegesById[id];
+    const name = college ? `${college.name}${college.shortName ? ` (${college.shortName})` : ""}` : id;
+    return `
+      <li class="saved-item" data-id="${id}">
+        <span>${name}</span>
+        <span>
+          <a href="college-detail.html?id=${id}" class="primary-button small">View</a>
+          <button type="button" class="remove-saved-btn" data-id="${id}">Remove</button>
+        </span>
+      </li>
+    `;
+  }).join("");
+
+  listEl.querySelectorAll(".remove-saved-btn").forEach((btn) => {
+    btn.addEventListener("click", () => removeSavedCollege(btn.dataset.id));
+  });
+}
+
+async function removeSavedCollege(collegeId) {
+  if (!currentUser) return;
+  try {
+    await updateDoc(doc(db, "users", currentUser.uid), {
+      savedColleges: arrayRemove(collegeId)
+    });
+    const snap = await getDoc(doc(db, "users", currentUser.uid));
+    const updatedIds = (snap.exists() && snap.data().savedColleges) || [];
+    await renderSavedColleges(updatedIds);
+  } catch (err) {
+    console.error("Could not remove saved college:", err);
+    alert("Could not remove this college right now. Please try again.");
+  }
+}
+
+/* ---------------- My Applications (real, Firestore-backed, no fake data) ---------------- */
+async function renderApplications(userEmail) {
+  const listContainer = document.getElementById("user-applications-list");
+  if (!listContainer) return;
+
+  let myApps = [];
+  try {
+    const appsQuery = query(collection(db, "applications"), where("studentEmail", "==", userEmail));
+    const querySnapshot = await getDocs(appsQuery);
+    querySnapshot.forEach((docSnap) => myApps.push({ id: docSnap.id, ...docSnap.data() }));
+  } catch (err) {
+    console.error("Could not load applications:", err);
+    listContainer.innerHTML = `<tr><td colspan="4" class="empty-state">Could not load your applications right now.</td></tr>`;
+    return;
+  }
+
+  if (!myApps.length) {
+    listContainer.innerHTML = `<tr><td colspan="4" class="empty-state">You have not submitted any enrollment applications yet.</td></tr>`;
+    return;
+  }
+
+  listContainer.innerHTML = myApps.map((app) => `
+    <tr>
+      <td><strong>${app.id}</strong></td>
+      <td>${app.college || "N/A"}</td>
+      <td>${app.date || "Recently"}</td>
+      <td><span class="status-badge ${(app.status || "pending").toLowerCase()}">${app.status || "Pending"}</span></td>
+    </tr>
+  `).join("");
 }

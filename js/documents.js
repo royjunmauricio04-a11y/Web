@@ -7,10 +7,7 @@
 
 import { db } from "./firebase-config.js";
 import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-// Point this at wherever js/server.js is actually running.
-// Locally that's http://localhost:3000 — update it once you deploy the backend.
-const API_BASE_URL = "http://localhost:3000";
+import { API_BASE_URL } from "./config.js";
 
 const DOC_TYPES = ["tor", "ef", "tcr"];
 const MAX_FILE_SIZE_MB = 10;
@@ -53,10 +50,15 @@ async function handleUpload(type, file, uid) {
       return;
     }
 
+    // Store an absolute URL (this page and js/server.js share an origin
+    // now, see server.js) so the Admin Panel — which may be hosted
+    // separately — can still open the file directly.
+    const absoluteUrl = data.url.startsWith("http") ? data.url : `${window.location.origin}${data.url}`;
+
     await updateDoc(doc(db, "users", uid), {
       [`documents.${type}`]: {
         fileName: data.fileName,
-        url: data.url,
+        url: absoluteUrl,
         uploadedAt: new Date().toISOString()
       }
     });
