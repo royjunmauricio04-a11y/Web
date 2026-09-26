@@ -23,7 +23,14 @@ app.use(express.static(SITE_ROOT));
 // Email — application link
 // ---------------------------------------------------------------------
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    // Render's network has no outbound route to Gmail's IPv6 SMTP address —
+    // Node's DNS lookup was picking that IPv6 address first, causing
+    // "connect ENETUNREACH ...:465" then "Connection timeout" on retry
+    // (confirmed in Render's logs). Forcing IPv4 skips the broken route.
+    family: 4,
     auth: {
         user: process.env.EMAIL_USER,
         // Gmail App Passwords are often copy-pasted with spaces
