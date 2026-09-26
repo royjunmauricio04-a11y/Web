@@ -266,48 +266,5 @@
 <script type="module" src="js/authGuard.js"></script>
 <script src="js/app.js"></script>
 <script src="js/cookie-consent.js"></script>
-<script type="module">
-    // Pulls editable homepage copy from Firestore (settings/homepage), set
-    // from the Admin Dashboard's "Site Content" tab. Any field left blank
-    // there, or missing entirely (first run, before an admin has edited
-    // anything), just keeps the default text already written into this
-    // HTML — nothing ever goes blank.
-    import { db } from "./js/firebase-config.js";
-    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    function setTextIfPresent(id, value) {
-        if (!value) return;
-        const el = document.getElementById(id);
-        if (el) el.textContent = value;
-    }
-
-    (async () => {
-        try {
-            const snap = await getDoc(doc(db, "settings", "homepage"));
-            if (!snap.exists()) return;
-            const c = snap.data();
-
-            setTextIfPresent("heroTitle", c.heroTitle);
-            setTextIfPresent("heroSubtitle", c.heroSubtitle);
-            setTextIfPresent("howItWorksIntro", c.howItWorksIntro);
-            setTextIfPresent("step1Title", c.step1Title);
-            setTextIfPresent("step1Desc", c.step1Desc);
-            setTextIfPresent("step2Title", c.step2Title);
-            setTextIfPresent("step2Desc", c.step2Desc);
-            setTextIfPresent("step3Title", c.step3Title);
-            setTextIfPresent("step3Desc", c.step3Desc);
-            setTextIfPresent("featuresIntro", c.featuresIntro);
-            setTextIfPresent("feature1Title", c.feature1Title);
-            setTextIfPresent("feature1Desc", c.feature1Desc);
-            setTextIfPresent("feature2Title", c.feature2Title);
-            setTextIfPresent("feature2Desc", c.feature2Desc);
-            setTextIfPresent("feature3Title", c.feature3Title);
-            setTextIfPresent("feature3Desc", c.feature3Desc);
-        } catch (err) {
-            console.error("Could not load homepage content, showing defaults:", err);
-        }
-    })();
-</script>
-
 </body>
 </html>

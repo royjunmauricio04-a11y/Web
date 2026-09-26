@@ -9,20 +9,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/royjunmauricio04-a11y/Web.git"
+    "url": "git+https://github.com/Dreamy2452/Webennroll.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/royjunmauricio04-a11y/Web/issues"
+    "url": "https://github.com/Dreamy2452/Webennroll/issues"
   },
-  "homepage": "https://github.com/royjunmauricio04-a11y/Web#readme",
+  "homepage": "https://github.com/Dreamy2452/Webennroll#readme",
   "dependencies": {
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "nodemailer": "^9.1.1"
+    "express": "^5.2.1"
   }
 }
