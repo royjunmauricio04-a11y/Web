@@ -27,11 +27,22 @@ const transporter = nodemailer.createTransport({
     port: 587,
     secure: false,
     family: 4,
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
             ? process.env.EMAIL_PASS.replace(/\s+/g, '')
             : ''
+    }
+});
+
+transporter.verify((error, success) => {
+    if (error) {
+        console.error('SMTP VERIFY ERROR:', error);
+    } else {
+        console.log('SMTP SERVER IS READY');
     }
 });
 
