@@ -184,30 +184,6 @@
         .status-badge.approved { background: #e7f8ee; color: #1c7a34; }
         .status-badge.rejected { background: #fdecec; color: #c0392b; }
 
-        /* Document upload rows */
-        .doc-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 14px;
-        }
-        .doc-row:last-child { border-bottom: none; }
-        .doc-row-label { color: #4b5563; font-weight: 600; }
-        .doc-row-status { font-size: 12px; color: #94a3b8; margin-top: 2px; }
-        .doc-upload-btn {
-            background: #eef2ff;
-            color: #1f56c5;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 14px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .doc-upload-btn:hover { background: #dfe6ff; }
     </style>
 </head>
 <body>
@@ -260,41 +236,6 @@
                 </div>
             </div>
 
-            <!-- FEATURE: DOCUMENT UPLOAD (TOR / Enrollment Form / TCR) -->
-            <div class="profile-card">
-                <h2 class="section-title">Upload Documents</h2>
-                <div class="doc-row">
-                    <div>
-                        <div class="doc-row-label">Transcript of Records (TOR)</div>
-                        <div class="doc-row-status" id="torStatus">No file uploaded yet.</div>
-                    </div>
-                    <label class="doc-upload-btn">
-                        Upload
-                        <input type="file" id="torInput" accept=".pdf,image/*" hidden>
-                    </label>
-                </div>
-                <div class="doc-row">
-                    <div>
-                        <div class="doc-row-label">Enrollment Form (EF)</div>
-                        <div class="doc-row-status" id="efStatus">No file uploaded yet.</div>
-                    </div>
-                    <label class="doc-upload-btn">
-                        Upload
-                        <input type="file" id="efInput" accept=".pdf,image/*" hidden>
-                    </label>
-                </div>
-                <div class="doc-row">
-                    <div>
-                        <div class="doc-row-label">Transfer Credential (TCR)</div>
-                        <div class="doc-row-status" id="tcrStatus">No file uploaded yet.</div>
-                    </div>
-                    <label class="doc-upload-btn">
-                        Upload
-                        <input type="file" id="tcrInput" accept=".pdf,image/*" hidden>
-                    </label>
-                </div>
-            </div>
-
             <!-- FEATURE: SAVED COLLEGES (real, from Firestore) -->
             <div class="profile-card">
                 <h2 class="section-title">Saved Universities</h2>
@@ -324,7 +265,6 @@
 <script type="module" src="js/authGuard.js"></script>
 <script src="js/cookie-consent.js"></script>
 <script type="module" src="js/profile.js"></script>
-<script type="module" src="js/documents.js"></script>
 
 </body>
 </html>
