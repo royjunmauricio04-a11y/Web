@@ -32,12 +32,19 @@ function showLoginError(message) {
   }
   loginError.textContent = message;
   loginError.hidden = false;
+  loginError.classList.add("show");
+}
+
+function hideLoginError() {
+  if (!loginError) return;
+  loginError.hidden = true;
+  loginError.classList.remove("show");
 }
 
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (loginError) loginError.hidden = true;
+    hideLoginError();
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
@@ -84,7 +91,7 @@ if (togglePasswordBtn && passwordInput) {
 if (forgotPasswordLink) {
   forgotPasswordLink.addEventListener("click", async (e) => {
     e.preventDefault();
-    if (loginError) loginError.hidden = true;
+    hideLoginError();
 
     const emailField = document.getElementById("email");
     const email = emailField ? emailField.value.trim() : "";
@@ -103,6 +110,7 @@ if (forgotPasswordLink) {
         loginError.style.color = "#1c7a34";
         loginError.textContent = `Password reset link sent to ${email}. Check your inbox (and spam folder).`;
         loginError.hidden = false;
+        loginError.classList.add("show");
       } else {
         alert(`Password reset link sent to ${email}.`);
       }
@@ -116,6 +124,7 @@ if (forgotPasswordLink) {
         loginError.style.color = "";
         loginError.textContent = message;
         loginError.hidden = false;
+        loginError.classList.add("show");
       } else {
         alert(message);
       }
