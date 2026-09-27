@@ -19,25 +19,29 @@ const SITE_ROOT = path.join(__dirname, '..');
 app.use(express.static(SITE_ROOT));
 
 // ---------------------------------------------------------------------
-// Email — application link, sent via Resend's HTTPS API instead of raw
-// SMTP. Render's outbound network could not reach smtp.gmail.com on
+// Email — application link, sent via MailerSend's HTTPS API instead of
+// raw SMTP. Render's outbound network could not reach smtp.gmail.com on
 // ports 587 or 465 no matter how the DNS/family settings were forced
 // (repeated ENETUNREACH to Gmail's IPv6 address) — that's a network-level
 // limitation of the Render service, not something fixable in code.
-// Resend sends over plain HTTPS (port 443), which always works.
+// MailerSend sends over plain HTTPS (port 443), which always works.
 //
 // Setup (one-time):
-//   1. Sign up free at https://resend.com
-//   2. Verify a sending domain (Resend -> Domains), OR while testing,
-//      send FROM "onboarding@resend.dev" and TO only your own signup
-//      email — Resend's shared test sender can't email anyone else
-//      until you verify your own domain.
-//   3. Create an API key (Resend -> API Keys).
-//   4. On Render: Environment -> add RESEND_API_KEY = <your key>.
-//      EMAIL_USER / EMAIL_PASS are no longer used and can be removed.
+//   1. In MailerSend -> Domains, copy your trial/sandbox domain — it
+//      looks like test-xxxxxxxxxxxxxxx.mlsender.net. Your sender address
+//      is anything @ that domain, e.g. noreply@test-xxxx.mlsender.net.
+//   2. While in trial/sandbox mode, MailerSend only lets you send TO the
+//      email address(es) you've added as "Recipients" under that trial
+//      domain (Domains -> your domain -> Recipients) — add your own
+//      email there to test. This limit goes away once you verify a real
+//      domain.
+//   3. Create an API key (MailerSend -> API Tokens).
+//   4. On Render -> Environment, add:
+//        MAILERSEND_API_KEY   = <your API token>
+//        MAILERSEND_FROM      = noreply@test-xxxx.mlsender.net  (yours)
 // ---------------------------------------------------------------------
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const RESEND_FROM = process.env.RESEND_FROM || 'COMPASS Support <onboarding@resend.dev>';
+const MAILERSEND_API_KEY = process.env.MAILERSEND_API_KEY;
+const MAILERSEND_FROM = process.env.MAILERSEND_FROM;
 
 app.post('/api/send-email', async (req, res) => {
     const { email, college, applyUrl, website } = req.body;
@@ -46,8 +50,8 @@ app.post('/api/send-email', async (req, res) => {
         return res.status(400).json({ success: false, message: 'Missing parameters' });
     }
 
-    if (!RESEND_API_KEY) {
-        console.error('RESEND_API_KEY is not set.');
+    if (!MAILERSEND_API_KEY || !MAILERSEND_FROM) {
+        console.error('MAILERSEND_API_KEY or MAILERSEND_FROM is not set.');
         return res.status(500).json({ success: false, message: 'Email service is not configured yet.' });
     }
 
@@ -72,25 +76,27 @@ app.post('/api/send-email', async (req, res) => {
     `;
 
     try {
-        const response = await fetch('https://api.resend.com/emails', {
+        const response = await fetch('https://api.mailersend.com/v1/email', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${RESEND_API_KEY}`,
+                'Authorization': `Bearer ${MAILERSEND_API_KEY}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                from: RESEND_FROM,
-                to: [email],
+                from: { email: MAILERSEND_FROM, name: 'COMPASS Support' },
+                to: [{ email }],
                 subject: `Application Link - ${college}`,
                 html: htmlBody
             })
         });
 
-        const data = await response.json();
-
+        // MailerSend returns 202 with an EMPTY body on success — only try
+        // to parse JSON when there's actually an error to read.
         if (!response.ok) {
-            console.error('Resend error:', data);
-            return res.status(500).json({ success: false, message: data.message || 'Failed to send email' });
+            let errorData = {};
+            try { errorData = await response.json(); } catch (e) { /* empty body */ }
+            console.error('MailerSend error:', errorData);
+            return res.status(500).json({ success: false, message: errorData.message || 'Failed to send email' });
         }
 
         res.status(200).json({ success: true, message: 'Email sent successfully!' });

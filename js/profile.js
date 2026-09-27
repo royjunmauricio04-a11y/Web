@@ -108,8 +108,8 @@ async function renderSavedColleges(savedIds) {
     const name = college ? `${college.name}${college.shortName ? ` (${college.shortName})` : ""}` : id;
     return `
       <li class="saved-item" data-id="${id}">
-        <span>${name}</span>
-        <span>
+        <span class="saved-item-title">${name}</span>
+        <span class="saved-actions">
           <a href="college-detail.html?id=${id}" class="primary-button small">View</a>
           <button type="button" class="remove-saved-btn" data-id="${id}">Remove</button>
         </span>
