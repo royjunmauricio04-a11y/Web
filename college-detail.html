@@ -312,13 +312,27 @@
 
 
 
+    function esc(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+    }
+
+    // Pre-fill the "send to my email" box with the signed-in student's email.
+    document.addEventListener('authReady', (e) => {
+        const input = document.getElementById('studentEmail');
+        if (input && !input.value && e.detail.user && e.detail.user.email) {
+            input.value = e.detail.user.email;
+        }
+    });
+
     function initials(name) {
         return name.split(/\s+/).filter(w => /^[A-Z]/.test(w)).map(w => w[0]).slice(0, 3).join('') || name.slice(0, 3).toUpperCase();
     }
 
     function handleBannerImgError(imgEl, shortName, color) {
         const wrap = imgEl.parentElement;
-        wrap.innerHTML = `<div class="profile-banner-placeholder" style="background:linear-gradient(135deg, ${color}, ${color}dd);"><span>${shortName}</span></div>`;
+        wrap.innerHTML = `<div class="profile-banner-placeholder" style="background:linear-gradient(135deg, ${color}, ${color}dd);"><span>${esc(shortName)}</span></div>`;
     }
     window.handleBannerImgError = handleBannerImgError;
 
@@ -373,23 +387,24 @@
 
         const bannerWrap = document.getElementById('bannerWrap');
         const color = c.color || '#1c3a5e';
+        const bannerName = c.shortName || initials(c.name);
         bannerWrap.innerHTML = c.image
-            ? `<img class="profile-banner" src="${c.image}" alt="${c.shortName || c.name}" onerror="window.handleBannerImgError(this, '${(c.shortName || initials(c.name)).replace(/'/g, "\\'")}', '${color}')">`
-            : `<div class="profile-banner-placeholder" style="background:linear-gradient(135deg, ${color}, ${color}dd);"><span>${c.shortName || initials(c.name)}</span></div>`;
+            ? `<img class="profile-banner" src="${esc(c.image)}" alt="${esc(bannerName)}" data-short="${esc(bannerName)}" data-color="${esc(color)}" onerror="window.handleBannerImgError(this, this.dataset.short, this.dataset.color)">`
+            : `<div class="profile-banner-placeholder" style="background:linear-gradient(135deg, ${color}, ${color}dd);"><span>${esc(bannerName)}</span></div>`;
 
         // Tag pills: city, strand tags, and any custom tags field
         const pills = [];
         if (c.city) pills.push(c.city);
         if (c.strand) c.strand.split(/\s+/).forEach(s => pills.push(s));
         if (c.tags) c.tags.split(',').map(t => t.trim()).filter(Boolean).forEach(t => pills.push(t));
-        document.getElementById('tagPills').innerHTML = pills.map(p => `<span class="tag-pill">${p}</span>`).join('');
+        document.getElementById('tagPills').innerHTML = pills.map(p => `<span class="tag-pill">${esc(p)}</span>`).join('');
 
         // Academic programs list
         const programsSection = document.getElementById('programsSection');
         const programsGrid = document.getElementById('programsGrid');
         const programs = c.programs ? c.programs.split(',').map(p => p.trim()).filter(Boolean) : [];
         if (programs.length) {
-            programsGrid.innerHTML = programs.map(p => `<div>${p}</div>`).join('');
+            programsGrid.innerHTML = programs.map(p => `<div>${esc(p)}</div>`).join('');
             programsSection.style.display = 'block';
         } else {
             programsSection.style.display = 'none';

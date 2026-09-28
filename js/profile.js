@@ -23,6 +23,13 @@ import {
 
 let currentUser = null;
 
+// Escape text before placing it in innerHTML.
+function esc(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+}
+
 // authGuard.js fires this once it has checked Firebase auth state and (for
 // protected pages) loaded the student's Firestore profile document.
 document.addEventListener("authReady", async (e) => {
@@ -58,15 +65,23 @@ function setText(id, text) {
 }
 
 function renderHeader(user, profile) {
-  const rawName = profile.firstName || profile.fullName || profile.name || "Student Name";
-  const firstName = rawName.trim().split(" ")[0];
-  const lastName = profile.lastName || (rawName.trim().split(" ").length > 1 ? rawName.trim().split(" ").slice(1).join(" ") : "");
-  const email = profile.email || user.email || "email@example.com";
-  const strand = profile.strand || (profile.interests && profile.interests[0]) || "TVL - ICT Student";
+  const firstName = String(profile.firstName || profile.first_name || profile.givenName || "").trim();
+  const middleName = String(profile.middleName || profile.middle_name || profile.middleInitial || "").trim();
+  const lastName = String(profile.lastName || profile.last_name || profile.surname || "").trim();
+  const displayName = String(profile.displayName || profile.fullName || profile.name || user.displayName || "").trim();
 
-  setText("userName", `${firstName} ${lastName}`.trim());
+  let fullName = [firstName, middleName, lastName].filter(Boolean).join(" ").trim();
+  if (!fullName && displayName) fullName = displayName;
+
+  const email = String(profile.email || user.email || "email@example.com").trim();
+  if (!fullName) fullName = email.split("@")[0] || "Student";
+
+  const avatarLetter = fullName.charAt(0).toUpperCase();
+  const strand = profile.strand || profile.track || (profile.interests && profile.interests[0]) || "TVL - ICT";
+
+  setText("userName", fullName);
   setText("userEmail", email);
-  setText("userAvatar", firstName.charAt(0).toUpperCase());
+  setText("userAvatar", avatarLetter);
   setText("userTrack", `${strand} Student`);
 }
 
@@ -107,11 +122,11 @@ async function renderSavedColleges(savedIds) {
     const college = collegesById[id];
     const name = college ? `${college.name}${college.shortName ? ` (${college.shortName})` : ""}` : id;
     return `
-      <li class="saved-item" data-id="${id}">
-        <span class="saved-item-title">${name}</span>
+      <li class="saved-item" data-id="${esc(id)}">
+        <span class="saved-item-title">${esc(name)}</span>
         <span class="saved-actions">
-          <a href="college-detail.html?id=${id}" class="primary-button small">View</a>
-          <button type="button" class="remove-saved-btn" data-id="${id}">Remove</button>
+          <a href="college-detail.html?id=${encodeURIComponent(id)}" class="primary-button small">View</a>
+          <button type="button" class="remove-saved-btn" data-id="${esc(id)}">Remove</button>
         </span>
       </li>
     `;
@@ -160,10 +175,10 @@ async function renderApplications(userEmail) {
 
   listContainer.innerHTML = myApps.map((app) => `
     <tr>
-      <td><strong>${app.id}</strong></td>
-      <td>${app.college || "N/A"}</td>
-      <td>${app.date || "Recently"}</td>
-      <td><span class="status-badge ${(app.status || "pending").toLowerCase()}">${app.status || "Pending"}</span></td>
+      <td><strong>${esc(app.id)}</strong></td>
+      <td>${esc(app.college || "N/A")}</td>
+      <td>${esc(app.date || "Recently")}</td>
+      <td><span class="status-badge ${esc((app.status || "pending").toLowerCase().replace(/[^a-z]/g, ""))}">${esc(app.status || "Pending")}</span></td>
     </tr>
   `).join("");
 }

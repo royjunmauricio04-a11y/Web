@@ -15,7 +15,7 @@
 
 import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const path = window.location.pathname.toLowerCase();
 const isProtectedPage = path.endsWith("colleges.html") || path.endsWith("profile.html");
@@ -51,6 +51,12 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   // Somebody is logged in.
+  // signup.js sets this flag while it is still saving the student's profile
+  // to Firestore. Redirecting now would cancel that write and leave an Auth
+  // account with no profile (which is why the admin Students table and
+  // charts stayed empty). signup.js redirects by itself when it's done.
+  if (window.__signupInProgress) return;
+
   if (isAuthPage) {
     window.location.href = "colleges.html";
     return;
@@ -61,7 +67,31 @@ onAuthStateChanged(auth, async (user) => {
   let profile = null;
   try {
     const snap = await getDoc(doc(db, "users", user.uid));
-    if (snap.exists()) profile = snap.data();
+    if (snap.exists()) {
+      profile = snap.data();
+    } else {
+      // Self-heal: an Auth account exists but its Firestore profile is
+      // missing (e.g. created before this fix). Create a minimal student
+      // profile so the student shows up in the admin dashboard.
+      const [first = "", ...rest] = (user.displayName || "").trim().split(" ");
+      const minimal = {
+        uid: user.uid,
+        role: "student",
+        firstName: first,
+        lastName: rest.join(" "),
+        email: (user.email || "").toLowerCase(),
+        createdAt: user.metadata && user.metadata.creationTime
+          ? new Date(user.metadata.creationTime).toISOString()
+          : new Date().toISOString(),
+        profileComplete: false
+      };
+      try {
+        await setDoc(doc(db, "users", user.uid), minimal);
+        profile = minimal;
+      } catch (createErr) {
+        console.error("Could not create missing profile:", createErr);
+      }
+    }
   } catch (err) {
     console.error("Could not load profile from Firestore:", err);
   }

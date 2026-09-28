@@ -14,6 +14,10 @@ document.addEventListener("DOMContentLoaded", () => {
     ========================================= */
     document.addEventListener('error', function (event) {
         if (event.target.tagName && event.target.tagName.toLowerCase() === 'img') {
+            // Only swap once — if the fallback image ALSO fails (offline/blocked),
+            // swapping again would loop forever.
+            if (event.target.dataset.fallbackApplied) return;
+            event.target.dataset.fallbackApplied = '1';
             event.target.src = 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=600&q=80';
         }
     }, true);

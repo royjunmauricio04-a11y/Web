@@ -11,7 +11,7 @@ import {
   browserLocalPersistence,
   browserSessionPersistence
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { trackTaskStart, trackTaskComplete, trackError } from "./analytics.js";
+import { trackTaskStart, trackTaskComplete, trackError, settle } from "./analytics.js";
 
 const loginForm = document.getElementById("loginForm");
 const loginError = document.getElementById("loginError");
@@ -58,7 +58,7 @@ if (loginForm) {
       await setPersistence(auth, persistence);
 
       await signInWithEmailAndPassword(auth, email, password);
-      trackTaskComplete("login");
+      await settle(trackTaskComplete("login"));
       window.location.href = "colleges.html";
     } catch (error) {
       console.error("Login error:", error.code);
@@ -102,6 +102,7 @@ if (forgotPasswordLink) {
       return;
     }
 
+    trackTaskStart("forgot_password");
     const originalText = forgotPasswordLink.textContent;
     forgotPasswordLink.textContent = "Sending...";
     try {

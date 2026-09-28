@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+    }
+
+    match /users/{userId} {
+      // A new account can create only its own student profile.
+      allow create: if request.auth != null &&
+        request.auth.uid == userId &&
+        request.resource.data.role == "student";
+
+      // Students can update their own profile, but cannot change role.
+      allow update: if request.auth != null &&
+        request.auth.uid == userId &&
+        request.resource.data.role == resource.data.role;
+
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if isAdmin();
+    }
+
+    match /analytics_events/{eventId} {
+      // Anonymous events are allowed for pre-login/signup activity.
+      // Authenticated events MUST identify the same Firebase UID as the caller.
+      allow create: if (
+        request.auth == null &&
+        request.resource.data.userId == null
+      ) || (
+        request.auth != null &&
+        request.resource.data.userId == request.auth.uid
+      );
+
+      allow read, delete: if isAdmin();
+    }
+
+    match /colleges/{collegeId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /applications/{applicationId} {
+      allow read: if request.auth != null &&
+        resource.data.studentEmail == request.auth.token.email;
+      allow read, write: if isAdmin();
+    }
+  }
+}

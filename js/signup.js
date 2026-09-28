@@ -1,7 +1,7 @@
-import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { auth, db } from "./firebase-config.js";
-import { trackTaskStart, trackTaskComplete, trackError } from "./analytics.js";
+import { trackTaskStart, trackTaskComplete, trackError, settle } from "./analytics.js";
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -68,20 +68,35 @@ document.addEventListener("DOMContentLoaded", function () {
         const email = getValue("email").toLowerCase();
         const password = document.getElementById("password").value;
 
+        // Tell authGuard.js not to redirect us away while we're still saving.
+        window.__signupInProgress = true;
+
         try {
             // Step A: Create User sa Firebase Authentication
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
+            // Keep the name in Firebase Auth too, so the profile and analytics
+            // can still identify the student even before Firestore is loaded.
+            const firstName = getValue("firstName");
+            const middleName = getValue("middleName");
+            const lastName = getValue("lastName");
+            const fullName = [firstName, middleName, lastName].filter(Boolean).join(" ").trim();
+            if (fullName) {
+                await updateProfile(user, { displayName: fullName });
+            }
+
             // Step B: Kunan ng data ang onboarding steps at i-save sa Firestore Database
             const accountData = buildAccountData(user.uid);
             await setDoc(doc(db, "users", user.uid), accountData);
 
+            await settle(trackTaskComplete("signup"));
             alert("Matagumpay ang paglikha ng iyong account!");
-            trackTaskComplete("signup");
-            window.location.href = "login.html";
+            window.__signupInProgress = false;
+            window.location.href = "colleges.html";
 
         } catch (error) {
+            window.__signupInProgress = false;
             console.error("Firebase Registration Error:", error);
             if (error.code === 'auth/email-already-in-use') {
                 showError("May nakarehistro nang account sa email na ito.");

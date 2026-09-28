@@ -567,6 +567,16 @@
 
     let COLLEGES = [];
 
+    // Escapes text before putting it into HTML. Needed because some college
+    // names contain quote characters (e.g. EARIST: Eulogio "Amang" Rodriguez),
+    // which used to break the data-name attribute so searching for "EARIST"
+    // found nothing. Also protects against odd characters typed in Admin.
+    function esc(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+    }
+
     // ==========================================================
     // RENDER COLLEGE CARDS
     // ==========================================================
@@ -581,36 +591,42 @@
     function handleCollegeImgError(imgEl, shortName, color) {
         const wrap = imgEl.parentElement;
         wrap.innerHTML = `<div class="college-image" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, ${color}, ${color}dd);height:100%;">
-            <span style="font-family:'Fraunces',serif;color:#fff;font-size:15px;letter-spacing:2px;border:1px solid rgba(255,255,255,0.5);padding:6px 12px;border-radius:3px;">${shortName}</span>
+            <span style="font-family:'Fraunces',serif;color:#fff;font-size:15px;letter-spacing:2px;border:1px solid rgba(255,255,255,0.5);padding:6px 12px;border-radius:3px;">${esc(shortName)}</span>
         </div>`;
     }
     window.handleCollegeImgError = handleCollegeImgError;
 
     function renderCollegeCards() {
-        collegeListEl.innerHTML = COLLEGES.map(c => `
-            <article class="college-card" style="--card-accent:${c.color};" data-id="${c.id}" data-name="${c.name} ${c.shortName}" data-strand="${c.strand}" data-location="${c.city}">
+        collegeListEl.innerHTML = COLLEGES.map(c => {
+            const color = /^#[0-9a-fA-F]{3,8}$/.test(c.color || '') ? c.color : '#1f56c5';
+            const shortName = c.shortName || initials(c.name || '');
+            const strand = c.strand || '';
+            return `
+            <article class="college-card" style="--card-accent:${color};" data-id="${esc(c.id)}" data-name="${esc(`${c.name || ''} ${c.shortName || ''}`)}" data-strand="${esc(strand)}" data-location="${esc(c.city || '')}">
                 <div class="college-img-wrap">
                     ${c.image
-                        ? `<img class="college-image" src="${c.image}" alt="${c.shortName}" loading="lazy" onerror="window.handleCollegeImgError(this, '${c.shortName}', '${c.color}')">`
-                        : `<div class="college-image" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, ${c.color}, ${c.color}dd);">
-                             <span style="font-family:'Fraunces',serif;color:#fff;font-size:15px;letter-spacing:2px;border:1px solid rgba(255,255,255,0.5);padding:6px 12px;border-radius:3px;">${c.shortName}</span>
+                        ? `<img class="college-image" src="${esc(c.image)}" alt="${esc(shortName)}" loading="lazy" data-short="${esc(shortName)}" data-color="${esc(color)}" onerror="window.handleCollegeImgError(this, this.dataset.short, this.dataset.color)">`
+                        : `<div class="college-image" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, ${color}, ${color}dd);">
+                             <span style="font-family:'Fraunces',serif;color:#fff;font-size:15px;letter-spacing:2px;border:1px solid rgba(255,255,255,0.5);padding:6px 12px;border-radius:3px;">${esc(shortName)}</span>
                            </div>`
                     }
                 </div>
                 <div class="college-content">
                     <div class="badge-container">
-                        <span class="badge-location">${c.location}</span>
-                        <span class="badge-strand">${c.strand.split(' ').join(' / ')}</span>
+                        <span class="badge-location">${esc(c.location || '')}</span>
+                        <span class="badge-strand">${esc(strand.split(/\s+/).filter(Boolean).join(' / '))}</span>
                     </div>
-                    <h3>${c.name}</h3>
-                    <p>${c.description}</p>
+                    <h3>${esc(c.name)}</h3>
+                    <p>${esc(c.description || '')}</p>
                 </div>
                 <div class="college-action">
-                    <a href="college-detail.html?id=${c.id}" class="official-link">View</a>
+                    <a href="college-detail.html?id=${encodeURIComponent(c.id)}" class="official-link">View</a>
                     <button type="button" class="save-card-btn" onclick="toggleSaveCollege(this)">Save</button>
                 </div>
-            </article>
-        `).join('');
+            </article>`;
+        }).join('');
+        // Re-apply whatever the student already typed/selected in the filters.
+        if (typeof filterColleges === 'function') filterColleges();
     }
 
     async function loadColleges() {
@@ -628,6 +644,14 @@
     }
 
     loadColleges();
+
+    // If authGuard.js already finished before this script ran, we'd miss the
+    // "authReady" event above — pick the state up directly.
+    if (window.currentUserProfile !== undefined && auth.currentUser) {
+        currentUserId = auth.currentUser.uid;
+        savedCollegeIds = (window.currentUserProfile && window.currentUserProfile.savedColleges) || [];
+        updateSaveButtonsUI();
+    }
 
     // Mobile Menu Toggle
     const menuButton = document.getElementById('menuButton');

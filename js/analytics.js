@@ -1,11 +1,8 @@
 // js/analytics.js
-// Automatic, background usability tracking for the research study.
-// Students don't see or do anything — every page that loads this file
-// quietly logs task start/finish/error events to Firestore, tagged with
-// a per-browser-tab session ID. The admin dashboard reads this collection
-// to compute Time on Task, Error Frequency, and Task Completion Rate.
+// Background usability/activity tracking for the research study.
+// Events are linked to the signed-in Firebase user whenever auth is available.
 
-import { db } from "./firebase-config.js";
+import { auth, db } from "./firebase-config.js";
 import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 function getSessionId() {
@@ -17,11 +14,46 @@ function getSessionId() {
   return sid;
 }
 
+function getCurrentUserSnapshot() {
+  const user = auth.currentUser;
+  const profile = window.currentUserProfile || {};
+
+  if (!user) {
+    return {
+      userId: null,
+      userEmail: null,
+      userName: null,
+      authenticated: false
+    };
+  }
+
+  const firstName = profile.firstName || profile.first_name || "";
+  const middleName = profile.middleName || profile.middle_name || "";
+  const lastName = profile.lastName || profile.last_name || "";
+  const userName = [firstName, middleName, lastName].filter(Boolean).join(" ").trim()
+    || profile.fullName
+    || profile.name
+    || user.displayName
+    || null;
+
+  return {
+    userId: user.uid,
+    userEmail: user.email || profile.email || null,
+    userName,
+    authenticated: true
+  };
+}
+
 async function logEvent(type, extra = {}) {
   try {
+    const identity = getCurrentUserSnapshot();
     await addDoc(collection(db, "analytics_events"), {
       sessionId: getSessionId(),
-      type, // "task_start" | "task_end" | "error"
+      userId: identity.userId,
+      userEmail: identity.userEmail,
+      userName: identity.userName,
+      authenticated: identity.authenticated,
+      type,
       page: window.location.pathname.split("/").pop() || "index.html",
       timestamp: new Date().toISOString(),
       ...extra
@@ -32,20 +64,38 @@ async function logEvent(type, extra = {}) {
   }
 }
 
+// These return the write's promise so a page can `await` it before
+// navigating away (otherwise the browser cancels the write and the
+// "completed" event is lost, making completion rates look wrong).
 export function trackTaskStart(taskName) {
-  logEvent("task_start", { taskName });
+  return logEvent("task_start", { taskName });
 }
 
 export function trackTaskComplete(taskName) {
-  logEvent("task_end", { taskName, outcome: "completed" });
+  return logEvent("task_end", { taskName, outcome: "completed" });
 }
 
 export function trackError(taskName, message) {
-  logEvent("error", { taskName, message: String(message).slice(0, 300) });
+  return logEvent("error", { taskName, message: String(message).slice(0, 300) });
+}
+
+// Wait for a tracking write, but never longer than ms (never block the student).
+export function settle(promise, ms = 2000) {
+  return Promise.race([
+    Promise.resolve(promise).catch(() => {}),
+    new Promise((resolve) => setTimeout(resolve, ms))
+  ]);
+}
+
+// Track a page view whenever this module is loaded.
+export function trackPageView(pageName = null) {
+  logEvent("page_view", {
+    pageName: pageName || window.location.pathname.split("/").pop() || "index.html"
+  });
 }
 
 // Catch-all: any unexpected JavaScript error on the page counts toward
-// Error Frequency too, not just the ones we explicitly track.
+// Error Frequency too, not just the ones explicitly tracked.
 window.addEventListener("error", (e) => {
   logEvent("error", { taskName: "javascript", message: String(e.message).slice(0, 300) });
 });
@@ -53,3 +103,7 @@ window.addEventListener("unhandledrejection", (e) => {
   const msg = e.reason && e.reason.message ? e.reason.message : String(e.reason);
   logEvent("error", { taskName: "javascript", message: String(msg).slice(0, 300) });
 });
+
+// Delay the initial page-view slightly so Firebase Auth has a chance to
+// restore the signed-in user before the event is written.
+setTimeout(() => trackPageView(), 700);
